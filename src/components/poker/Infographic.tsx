@@ -54,19 +54,15 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
         <div className="h-1 bg-primary" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-3xl">🎰</span>
-            <div>
-              <h3 className="text-[13px] font-black text-text-primary tracking-[0.15em]">
-                RESUMEN DE SESIÓN
-              </h3>
-              <p className="text-[11px] font-medium text-text-secondary tracking-wider">
-                Poker Night
-              </p>
-            </div>
-          </div>
-          <div className="bg-foreground/[0.06] rounded-md px-2.5 py-1 border border-border">
+        <div className="flex flex-col items-center px-4 pt-4 pb-3 gap-1">
+          <span className="text-3xl">🎰</span>
+          <h3 className="text-[14px] font-black text-text-primary tracking-[0.15em]">
+            RESUMEN DE SESIÓN
+          </h3>
+          <p className="text-[11px] font-medium text-text-secondary tracking-wider">
+            Poker Night
+          </p>
+          <div className="bg-foreground/[0.06] rounded-md px-2.5 py-1 border border-border mt-1">
             <span className="text-[11px] font-semibold text-text-secondary">📅 {date}</span>
           </div>
         </div>
