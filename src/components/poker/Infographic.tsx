@@ -89,8 +89,9 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
         <div className="px-3.5 flex flex-col gap-2">
           {sorted.map((p, idx) => {
             const rebuysTotal = p.rebuys.reduce((s, r) => s + r.amount, 0);
-            const invested = p.buyIn + rebuysTotal;
+            const invested = globalBuyIn + rebuysTotal;
             const pnl = p.finalChips - invested;
+            const deposito = pnl; // positive = caja paga, negative = jugador paga
             const isWin = pnl >= 0;
             const { medal, className } = getRank(idx);
             const initials = p.name

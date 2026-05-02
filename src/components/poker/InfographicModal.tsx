@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import { X, Image as ImageIcon, Check, Loader2 } from "lucide-react";
+import { X, Image as ImageIcon, Check, Loader2, MessageCircle } from "lucide-react";
 import html2canvas from "html2canvas";
 import { Player } from "@/context/SessionContext";
 import Infographic from "./Infographic";
+import { generateSummaryMessage, openWhatsApp } from "@/lib/whatsapp";
 import { toast } from "sonner";
 
 export default function InfographicModal({
@@ -10,11 +11,15 @@ export default function InfographicModal({
   onClose,
   players,
   sessionDate,
+  globalBuyIn,
+  utilidad,
 }: {
   open: boolean;
   onClose: () => void;
   players: Player[];
   sessionDate: string;
+  globalBuyIn: number;
+  utilidad: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
@@ -43,11 +48,16 @@ export default function InfographicModal({
       toast.success("Imagen descargada", {
         description: "Compártela por WhatsApp desde tu carpeta de descargas.",
       });
-    } catch (err) {
+    } catch {
       toast.error("No se pudo guardar la imagen.");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleWhatsApp = () => {
+    const msg = generateSummaryMessage(players, sessionDate, globalBuyIn);
+    openWhatsApp(msg);
   };
 
   return (
@@ -64,36 +74,51 @@ export default function InfographicModal({
 
       <div className="flex-1 overflow-y-auto flex flex-col items-center pt-5 pb-4 px-4">
         <p className="text-sm text-text-secondary text-center mb-4 px-6 leading-relaxed">
-          Presiona "Descargar imagen" y luego comparte desde tu galería por WhatsApp
+          Descarga la imagen y compártela por WhatsApp desde tu galería, o envía el resumen como texto.
         </p>
         <div className="shadow-emerald rounded-2xl">
-          <Infographic ref={ref} players={players} sessionDate={sessionDate} />
+          <Infographic
+            ref={ref}
+            players={players}
+            sessionDate={sessionDate}
+            globalBuyIn={globalBuyIn}
+            utilidad={utilidad}
+          />
         </div>
       </div>
 
-      <div className="flex gap-2 px-4 pt-3 pb-6 border-t border-border bg-background">
+      <div className="flex flex-col gap-2 px-4 pt-3 pb-6 border-t border-border bg-background">
         <button
-          onClick={onClose}
-          className="flex-1 py-3 rounded-2xl border border-border text-text-secondary font-bold"
+          onClick={handleWhatsApp}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-whatsapp text-text-inverse font-extrabold shadow-[0_4px_20px_hsl(var(--whatsapp)/0.4)]"
         >
-          Cerrar
+          <MessageCircle size={20} />
+          Enviar texto por WhatsApp
         </button>
-        <button
-          onClick={handleDownload}
-          disabled={saving}
-          className={`flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-primary text-text-inverse font-extrabold shadow-emerald ${
-            saving ? "opacity-70" : ""
-          }`}
-        >
-          {saving ? (
-            <Loader2 size={20} className="animate-spin" />
-          ) : saved ? (
-            <Check size={20} />
-          ) : (
-            <ImageIcon size={20} />
-          )}
-          {saving ? "Guardando…" : saved ? "Listo" : "Descargar imagen"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-2xl border border-border text-text-secondary font-bold"
+          >
+            Cerrar
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={saving}
+            className={`flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-primary text-text-inverse font-extrabold shadow-emerald ${
+              saving ? "opacity-70" : ""
+            }`}
+          >
+            {saving ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : saved ? (
+              <Check size={20} />
+            ) : (
+              <ImageIcon size={20} />
+            )}
+            {saving ? "Guardando…" : saved ? "Listo" : "Descargar imagen"}
+          </button>
+        </div>
       </div>
     </div>
   );
