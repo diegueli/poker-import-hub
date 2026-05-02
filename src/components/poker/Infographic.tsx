@@ -72,7 +72,7 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
           </div>
         </div>
 
-        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3.5 mb-3.5 flex flex-col items-center">
+        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3.5 mb-3 flex flex-col items-center">
           <span className="text-[10px] text-text-secondary font-bold tracking-[0.15em] mb-1">
             💰 POT TOTAL
           </span>
@@ -83,6 +83,29 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
             CLP · {players.length} jugadores
           </span>
         </div>
+
+        {(utilidad > 0 || globalBuyIn > 0) && (
+          <div className="mx-3.5 mb-3 glass border border-border rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-1.5">
+              <span className="text-[10px] text-text-secondary font-bold tracking-wider">BUY-IN</span>
+              <span className="text-[12px] font-extrabold text-text-primary tabular-nums">
+                {formatCLP(globalBuyIn)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3 py-1.5 border-t border-border">
+              <span className="text-[10px] text-text-secondary font-bold tracking-wider">UTILIDAD CAJA</span>
+              <span className="text-[12px] font-extrabold text-warning tabular-nums">
+                {formatCLP(utilidad)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3 py-1.5 border-t border-border emerald-glow">
+              <span className="text-[10px] text-primary font-bold tracking-wider">DEPÓSITO CAJA</span>
+              <span className="text-[12px] font-extrabold text-primary tabular-nums">
+                {formatCLP(depositoCajaTotal)}
+              </span>
+            </div>
+          </div>
+        )}
 
         <div className="h-px bg-border mx-3.5 mb-3" />
 
@@ -140,6 +163,16 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
                       </span>
                     </div>
                   </div>
+                  {deposito !== 0 && (
+                    <p
+                      className={`text-[9px] font-bold mt-0.5 ${
+                        isWin ? "text-primary" : "text-crimson-light"
+                      }`}
+                    >
+                      {isWin ? "💳 Caja deposita: " : "💳 Paga a caja: "}
+                      {formatCLP(Math.abs(deposito))}
+                    </p>
+                  )}
                 </div>
                 <div
                   className={`flex flex-col items-center px-2 py-1 rounded-md ${
