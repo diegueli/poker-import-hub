@@ -14,7 +14,6 @@ export type Player = {
   id: string;
   name: string;
   photo: string | null;
-  buyIn: number;
   buyInConfirmed: boolean;
   buyInConfirmedAt: string | null;
   rebuys: Rebuy[];
@@ -26,6 +25,8 @@ export type SessionStateName = "OPEN" | "LOCKED" | "SETTLED";
 export type State = {
   sessionState: SessionStateName;
   sessionDate: string;
+  globalBuyIn: number;
+  utilidad: number;
   players: Player[];
 };
 
@@ -33,6 +34,8 @@ type Action =
   | { type: "LOAD_STATE"; payload: Partial<State> }
   | { type: "RESET_SESSION" }
   | { type: "SET_SESSION_STATE"; payload: SessionStateName }
+  | { type: "SET_GLOBAL_BUYIN"; payload: number }
+  | { type: "SET_UTILIDAD"; payload: number }
   | { type: "ADD_PLAYER"; payload: { name: string; photo: string | null } }
   | { type: "REMOVE_PLAYER"; payload: string }
   | { type: "UPDATE_PLAYER"; payload: { id: string; field: keyof Player; value: Player[keyof Player] } }
@@ -47,7 +50,6 @@ function makePlayer(name = "", photo: string | null = null): Player {
     id: generateId(),
     name,
     photo,
-    buyIn: 0,
     buyInConfirmed: false,
     buyInConfirmedAt: null,
     rebuys: [],
@@ -62,6 +64,8 @@ function makeRebuy(): Rebuy {
 const initialState: State = {
   sessionState: "OPEN",
   sessionDate: new Date().toISOString(),
+  globalBuyIn: 0,
+  utilidad: 0,
   players: [],
 };
 
@@ -73,6 +77,10 @@ function reducer(state: State, action: Action): State {
       return { ...initialState, sessionDate: new Date().toISOString() };
     case "SET_SESSION_STATE":
       return { ...state, sessionState: action.payload };
+    case "SET_GLOBAL_BUYIN":
+      return { ...state, globalBuyIn: action.payload };
+    case "SET_UTILIDAD":
+      return { ...state, utilidad: action.payload };
     case "ADD_PLAYER":
       return { ...state, players: [...state.players, makePlayer(action.payload.name, action.payload.photo)] };
     case "REMOVE_PLAYER":
@@ -145,28 +153,43 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function computeSessionStats(players: Player[]) {
+export function computeSessionStats(state: State) {
+  const { players, globalBuyIn = 0, utilidad = 0 } = state;
+
   let confirmedPot = 0;
   let unconfirmedDebt = 0;
-  let totalInvested = 0;
   let totalFinalChips = 0;
 
   players.forEach((p) => {
-    const rebuysTotal = p.rebuys.reduce((s, r) => s + r.amount, 0);
-    const invested = p.buyIn + rebuysTotal;
-    totalInvested += invested;
-    totalFinalChips += p.finalChips;
-    if (p.buyInConfirmed) confirmedPot += p.buyIn;
-    else unconfirmedDebt += p.buyIn;
+    if (globalBuyIn > 0) {
+      if (p.buyInConfirmed) confirmedPot += globalBuyIn;
+      else unconfirmedDebt += globalBuyIn;
+    }
     p.rebuys.forEach((r) => {
       if (r.confirmed) confirmedPot += r.amount;
-      else unconfirmedDebt += r.amount;
+      else if (r.amount > 0) unconfirmedDebt += r.amount;
     });
+    totalFinalChips += p.finalChips;
   });
 
+  const totalRebuys = players.reduce(
+    (sum, p) => sum + p.rebuys.reduce((s, r) => s + r.amount, 0),
+    0
+  );
+  const totalInvested = globalBuyIn * players.length + totalRebuys;
   const discrepancy = totalInvested - totalFinalChips;
   const isBalanced = players.length > 0 && discrepancy === 0;
-  return { confirmedPot, unconfirmedDebt, totalInvested, totalFinalChips, discrepancy, isBalanced };
+  const depositoCaja = Math.max(0, totalInvested - utilidad);
+
+  return {
+    confirmedPot,
+    unconfirmedDebt,
+    totalInvested,
+    totalFinalChips,
+    discrepancy,
+    isBalanced,
+    depositoCaja,
+  };
 }
 
 type Ctx = {
@@ -180,7 +203,6 @@ const SessionContext = createContext<Ctx | null>(null);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Load
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -188,7 +210,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     } catch { /* ignore */ }
   }, []);
 
-  // Persist
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));

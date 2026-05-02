@@ -2,6 +2,7 @@ import { useState } from "react";
 import { UserPlus, Spade } from "lucide-react";
 import { SessionProvider, useSession } from "@/context/SessionContext";
 import DataIntegrityHeader from "@/components/poker/DataIntegrityHeader";
+import SessionConfig from "@/components/poker/SessionConfig";
 import PlayerCard from "@/components/poker/PlayerCard";
 import TableBalanceWidget from "@/components/poker/TableBalanceWidget";
 import FooterActions from "@/components/poker/FooterActions";
@@ -18,6 +19,7 @@ function HomeScreen() {
       <DataIntegrityHeader />
 
       <main className="flex-1 overflow-y-auto pt-3">
+        <SessionConfig />
         {players.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center px-6 py-20 gap-3">
             <Spade size={64} className="text-text-muted" />

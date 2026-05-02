@@ -13,8 +13,15 @@ function getRank(idx: number) {
   return RANKS[idx] || { medal: `${idx + 1}°`, className: "text-text-secondary" };
 }
 
-const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate: string }>(
-  function Infographic({ players, sessionDate }, ref) {
+type InfographicProps = {
+  players: Player[];
+  sessionDate: string;
+  globalBuyIn?: number;
+  utilidad?: number;
+};
+
+const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
+  function Infographic({ players, sessionDate, globalBuyIn = 0, utilidad = 0 }, ref) {
     const date = sessionDate
       ? new Date(sessionDate).toLocaleDateString("es-CL", {
           day: "2-digit",
@@ -23,20 +30,22 @@ const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate:
         })
       : new Date().toLocaleDateString("es-CL");
 
-    const totalPot = players.reduce(
-      (sum, p) => sum + p.buyIn + p.rebuys.reduce((s, r) => s + r.amount, 0),
+    const totalRebuys = players.reduce(
+      (sum, p) => sum + p.rebuys.reduce((s, r) => s + r.amount, 0),
       0
     );
+    const totalPot = globalBuyIn * players.length + totalRebuys;
+    const depositoCajaTotal = Math.max(0, totalPot - utilidad);
 
     const sorted = [...players].sort((a, b) => {
-      const pnlA = a.finalChips - (a.buyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
-      const pnlB = b.finalChips - (b.buyIn + b.rebuys.reduce((s, r) => s + r.amount, 0));
+      const pnlA = a.finalChips - (globalBuyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
+      const pnlB = b.finalChips - (globalBuyIn + b.rebuys.reduce((s, r) => s + r.amount, 0));
       return pnlB - pnlA;
     });
 
     const winner = sorted[0];
     const winnerPnl = winner
-      ? winner.finalChips - (winner.buyIn + winner.rebuys.reduce((s, r) => s + r.amount, 0))
+      ? winner.finalChips - (globalBuyIn + winner.rebuys.reduce((s, r) => s + r.amount, 0))
       : 0;
 
     return (
@@ -63,7 +72,7 @@ const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate:
           </div>
         </div>
 
-        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3.5 mb-3.5 flex flex-col items-center">
+        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3.5 mb-3 flex flex-col items-center">
           <span className="text-[10px] text-text-secondary font-bold tracking-[0.15em] mb-1">
             💰 POT TOTAL
           </span>
@@ -75,13 +84,37 @@ const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate:
           </span>
         </div>
 
+        {(utilidad > 0 || globalBuyIn > 0) && (
+          <div className="mx-3.5 mb-3 glass border border-border rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-1.5">
+              <span className="text-[10px] text-text-secondary font-bold tracking-wider">BUY-IN</span>
+              <span className="text-[12px] font-extrabold text-text-primary tabular-nums">
+                {formatCLP(globalBuyIn)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3 py-1.5 border-t border-border">
+              <span className="text-[10px] text-text-secondary font-bold tracking-wider">UTILIDAD CAJA</span>
+              <span className="text-[12px] font-extrabold text-warning tabular-nums">
+                {formatCLP(utilidad)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3 py-1.5 border-t border-border emerald-glow">
+              <span className="text-[10px] text-primary font-bold tracking-wider">DEPÓSITO CAJA</span>
+              <span className="text-[12px] font-extrabold text-primary tabular-nums">
+                {formatCLP(depositoCajaTotal)}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="h-px bg-border mx-3.5 mb-3" />
 
         <div className="px-3.5 flex flex-col gap-2">
           {sorted.map((p, idx) => {
             const rebuysTotal = p.rebuys.reduce((s, r) => s + r.amount, 0);
-            const invested = p.buyIn + rebuysTotal;
+            const invested = globalBuyIn + rebuysTotal;
             const pnl = p.finalChips - invested;
+            const deposito = pnl; // positive = caja paga, negative = jugador paga
             const isWin = pnl >= 0;
             const { medal, className } = getRank(idx);
             const initials = p.name
@@ -130,6 +163,16 @@ const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate:
                       </span>
                     </div>
                   </div>
+                  {deposito !== 0 && (
+                    <p
+                      className={`text-[9px] font-bold mt-0.5 ${
+                        isWin ? "text-primary" : "text-crimson-light"
+                      }`}
+                    >
+                      {isWin ? "💳 Caja deposita: " : "💳 Paga a caja: "}
+                      {formatCLP(Math.abs(deposito))}
+                    </p>
+                  )}
                 </div>
                 <div
                   className={`flex flex-col items-center px-2 py-1 rounded-md ${

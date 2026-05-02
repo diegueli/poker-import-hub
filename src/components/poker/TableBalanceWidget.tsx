@@ -5,7 +5,7 @@ import { formatCLP } from "@/lib/currency";
 export default function TableBalanceWidget() {
   const { state } = useSession();
   const { players } = state;
-  const { totalInvested, totalFinalChips, discrepancy, isBalanced } = computeSessionStats(players);
+  const { totalInvested, totalFinalChips, discrepancy, isBalanced } = computeSessionStats(state);
 
   if (players.length === 0) return null;
 

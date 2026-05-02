@@ -21,7 +21,7 @@ const STATE_DOT: Record<SessionStateName, string> = {
 export default function DataIntegrityHeader() {
   const { state, dispatch } = useSession();
   const { sessionState, players, sessionDate } = state;
-  const { confirmedPot, unconfirmedDebt } = computeSessionStats(players);
+  const { confirmedPot, unconfirmedDebt } = computeSessionStats(state);
 
   const date = new Date(sessionDate).toLocaleDateString("es-CL", {
     day: "2-digit",

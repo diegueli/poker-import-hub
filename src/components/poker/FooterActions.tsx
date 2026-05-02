@@ -6,8 +6,8 @@ import { toast } from "sonner";
 
 export default function FooterActions() {
   const { state, resetSession } = useSession();
-  const { players, sessionDate } = state;
-  const { isBalanced } = computeSessionStats(players);
+  const { players, sessionDate, globalBuyIn, utilidad } = state;
+  const { isBalanced } = computeSessionStats(state);
   const [modal, setModal] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -78,6 +78,8 @@ export default function FooterActions() {
         onClose={() => setModal(false)}
         players={players}
         sessionDate={sessionDate}
+        globalBuyIn={globalBuyIn}
+        utilidad={utilidad}
       />
     </>
   );
