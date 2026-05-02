@@ -12,14 +12,12 @@ export default function InfographicModal({
   players,
   sessionDate,
   globalBuyIn,
-  utilidad,
 }: {
   open: boolean;
   onClose: () => void;
   players: Player[];
   sessionDate: string;
   globalBuyIn: number;
-  utilidad: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
@@ -82,7 +80,6 @@ export default function InfographicModal({
             players={players}
             sessionDate={sessionDate}
             globalBuyIn={globalBuyIn}
-            utilidad={utilidad}
           />
         </div>
       </div>
