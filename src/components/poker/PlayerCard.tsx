@@ -130,13 +130,15 @@ function AmountRow({
 export default function PlayerCard({ player }: { player: Player }) {
   const { dispatch, state } = useSession();
   const isLocked = state.sessionState !== "OPEN";
+  const globalBuyIn = state.globalBuyIn;
 
   const rebuysTotal = player.rebuys.reduce((s, r) => s + r.amount, 0);
-  const totalInvested = player.buyIn + rebuysTotal;
+  const totalInvested = globalBuyIn + rebuysTotal;
   const pnl = player.finalChips - totalInvested;
   const hasFinalChips = player.finalChips > 0;
+  const hasBuyIn = globalBuyIn > 0;
   const hasUnconfirmed =
-    (player.buyIn > 0 && !player.buyInConfirmed) ||
+    (hasBuyIn && !player.buyInConfirmed) ||
     player.rebuys.some((r) => r.amount > 0 && !r.confirmed);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -208,18 +210,27 @@ export default function PlayerCard({ player }: { player: Player }) {
 
       <div className="h-px bg-border mx-3" />
 
-      {/* Buy-in */}
-      <AmountRow
-        label="Buy-in"
-        value={player.buyIn}
-        confirmed={player.buyInConfirmed}
-        confirmedAt={player.buyInConfirmedAt}
-        onChangeAmount={(v) =>
-          dispatch({ type: "UPDATE_PLAYER", payload: { id: player.id, field: "buyIn", value: v } })
-        }
-        onToggleConfirm={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
-        disabled={isLocked}
-      />
+      {/* Buy-in (read-only, global) */}
+      <div
+        className={`flex items-center gap-2 mx-1 my-0.5 px-3 py-2 rounded-md ${
+          hasBuyIn && !player.buyInConfirmed ? "crimson-glow border crimson-border" : ""
+        }`}
+      >
+        <span className="text-xs text-text-secondary font-semibold w-14">Buy-in</span>
+        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2 py-1 gap-1">
+          <Coins size={14} className="text-primary" />
+          <span className="flex-1 text-base text-text-primary font-bold tabular-nums">
+            {hasBuyIn ? formatCLP(globalBuyIn) : "—"}
+          </span>
+          <span className="text-[10px] text-text-muted">CLP</span>
+        </div>
+        <ConfirmCheckbox
+          confirmed={player.buyInConfirmed}
+          confirmedAt={player.buyInConfirmedAt}
+          onToggle={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
+          disabled={!hasBuyIn || isLocked}
+        />
+      </div>
 
       {/* Rebuys */}
       {player.rebuys.map((r, idx) => (

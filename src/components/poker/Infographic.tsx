@@ -13,8 +13,15 @@ function getRank(idx: number) {
   return RANKS[idx] || { medal: `${idx + 1}°`, className: "text-text-secondary" };
 }
 
-const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate: string }>(
-  function Infographic({ players, sessionDate }, ref) {
+type InfographicProps = {
+  players: Player[];
+  sessionDate: string;
+  globalBuyIn?: number;
+  utilidad?: number;
+};
+
+const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
+  function Infographic({ players, sessionDate, globalBuyIn = 0, utilidad = 0 }, ref) {
     const date = sessionDate
       ? new Date(sessionDate).toLocaleDateString("es-CL", {
           day: "2-digit",
@@ -23,20 +30,22 @@ const Infographic = forwardRef<HTMLDivElement, { players: Player[]; sessionDate:
         })
       : new Date().toLocaleDateString("es-CL");
 
-    const totalPot = players.reduce(
-      (sum, p) => sum + p.buyIn + p.rebuys.reduce((s, r) => s + r.amount, 0),
+    const totalRebuys = players.reduce(
+      (sum, p) => sum + p.rebuys.reduce((s, r) => s + r.amount, 0),
       0
     );
+    const totalPot = globalBuyIn * players.length + totalRebuys;
+    const depositoCajaTotal = Math.max(0, totalPot - utilidad);
 
     const sorted = [...players].sort((a, b) => {
-      const pnlA = a.finalChips - (a.buyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
-      const pnlB = b.finalChips - (b.buyIn + b.rebuys.reduce((s, r) => s + r.amount, 0));
+      const pnlA = a.finalChips - (globalBuyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
+      const pnlB = b.finalChips - (globalBuyIn + b.rebuys.reduce((s, r) => s + r.amount, 0));
       return pnlB - pnlA;
     });
 
     const winner = sorted[0];
     const winnerPnl = winner
-      ? winner.finalChips - (winner.buyIn + winner.rebuys.reduce((s, r) => s + r.amount, 0))
+      ? winner.finalChips - (globalBuyIn + winner.rebuys.reduce((s, r) => s + r.amount, 0))
       : 0;
 
     return (
