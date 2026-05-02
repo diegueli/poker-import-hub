@@ -112,17 +112,25 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`text-sm font-extrabold shrink-0 ${className}`}>{medal}</span>
                   <div
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    className={`w-9 h-9 rounded-full border-2 shrink-0 overflow-hidden flex items-center justify-center ${
                       isWin ? "border-primary" : "border-crimson-light"
                     }`}
                   >
-                    <span
-                      className={`text-xs font-extrabold ${
-                        isWin ? "text-primary" : "text-crimson-light"
-                      }`}
-                    >
-                      {initials}
-                    </span>
+                    {p.photo ? (
+                      <img
+                        src={p.photo}
+                        alt={p.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span
+                        className={`text-xs font-extrabold ${
+                          isWin ? "text-primary" : "text-crimson-light"
+                        }`}
+                      >
+                        {initials}
+                      </span>
+                    )}
                   </div>
                   <p className="text-[13px] font-bold text-text-primary truncate flex-1">
                     {p.name || "Jugador"}
