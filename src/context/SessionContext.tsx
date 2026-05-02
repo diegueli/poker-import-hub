@@ -26,7 +26,6 @@ export type State = {
   sessionState: SessionStateName;
   sessionDate: string;
   globalBuyIn: number;
-  utilidad: number;
   players: Player[];
 };
 
@@ -35,7 +34,6 @@ type Action =
   | { type: "RESET_SESSION" }
   | { type: "SET_SESSION_STATE"; payload: SessionStateName }
   | { type: "SET_GLOBAL_BUYIN"; payload: number }
-  | { type: "SET_UTILIDAD"; payload: number }
   | { type: "ADD_PLAYER"; payload: { name: string; photo: string | null } }
   | { type: "REMOVE_PLAYER"; payload: string }
   | { type: "UPDATE_PLAYER"; payload: { id: string; field: keyof Player; value: Player[keyof Player] } }
@@ -65,7 +63,6 @@ const initialState: State = {
   sessionState: "OPEN",
   sessionDate: new Date().toISOString(),
   globalBuyIn: 0,
-  utilidad: 0,
   players: [],
 };
 
@@ -79,8 +76,6 @@ function reducer(state: State, action: Action): State {
       return { ...state, sessionState: action.payload };
     case "SET_GLOBAL_BUYIN":
       return { ...state, globalBuyIn: action.payload };
-    case "SET_UTILIDAD":
-      return { ...state, utilidad: action.payload };
     case "ADD_PLAYER":
       return { ...state, players: [...state.players, makePlayer(action.payload.name, action.payload.photo)] };
     case "REMOVE_PLAYER":
@@ -154,7 +149,7 @@ function reducer(state: State, action: Action): State {
 }
 
 export function computeSessionStats(state: State) {
-  const { players, globalBuyIn = 0, utilidad = 0 } = state;
+  const { players, globalBuyIn = 0 } = state;
 
   let confirmedPot = 0;
   let unconfirmedDebt = 0;
@@ -179,7 +174,6 @@ export function computeSessionStats(state: State) {
   const totalInvested = globalBuyIn * players.length + totalRebuys;
   const discrepancy = totalInvested - totalFinalChips;
   const isBalanced = players.length > 0 && discrepancy === 0;
-  const depositoCaja = Math.max(0, totalInvested - utilidad);
 
   return {
     confirmedPot,
@@ -188,7 +182,6 @@ export function computeSessionStats(state: State) {
     totalFinalChips,
     discrepancy,
     isBalanced,
-    depositoCaja,
   };
 }
 

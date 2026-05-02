@@ -34,17 +34,17 @@ export function generateSummaryMessage(
 
   sorted.forEach((player) => {
     const rebuysTotal = player.rebuys.reduce((s, r) => s + r.amount, 0);
-    const invested = globalBuyIn + rebuysTotal;
-    const pnl = player.finalChips - invested;
+    const compras = globalBuyIn + rebuysTotal;
+    const pnl = player.finalChips - compras;
     const isWinner = pnl >= 0;
 
     msg += `👤 *${player.name}*\n`;
-    msg += `  📥 Invirtió: ${formatCLP(invested)} CLP\n`;
+    msg += `  📥 Compras: ${formatCLP(compras)} CLP\n`;
     if (player.rebuys.length > 0) {
       msg += `     _(Buy-in: ${formatCLP(globalBuyIn)} + Rebuys: ${formatCLP(rebuysTotal)})_\n`;
     }
-    msg += `  📤 Retira: ${formatCLP(player.finalChips)} CLP\n`;
-    msg += `  ${isWinner ? "✅" : "❌"} *Resultado: ${formatCLPSigned(pnl)} CLP*\n`;
+    msg += `  🎲 Total fichas: ${formatCLP(player.finalChips)} CLP\n`;
+    msg += `  ${isWinner ? "✅" : "❌"} *Utilidad: ${formatCLPSigned(pnl)} CLP*\n`;
 
     if (!isWinner && winners.length > 0) {
       msg += `  💸 _Paga a ${winners[0].name}_\n`;

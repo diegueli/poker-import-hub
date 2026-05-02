@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 export default function FooterActions() {
   const { state, resetSession } = useSession();
-  const { players, sessionDate, globalBuyIn, utilidad } = state;
+  const { players, sessionDate, globalBuyIn } = state;
   const { isBalanced } = computeSessionStats(state);
   const [modal, setModal] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -79,7 +79,6 @@ export default function FooterActions() {
         players={players}
         sessionDate={sessionDate}
         globalBuyIn={globalBuyIn}
-        utilidad={utilidad}
       />
     </>
   );

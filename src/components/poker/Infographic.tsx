@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { ArrowRight, BadgeCheck } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { Player } from "@/context/SessionContext";
 import { formatCLP, formatCLPSigned } from "@/lib/currency";
 
@@ -17,11 +17,10 @@ type InfographicProps = {
   players: Player[];
   sessionDate: string;
   globalBuyIn?: number;
-  utilidad?: number;
 };
 
 const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
-  function Infographic({ players, sessionDate, globalBuyIn = 0, utilidad = 0 }, ref) {
+  function Infographic({ players, sessionDate, globalBuyIn = 0 }, ref) {
     const date = sessionDate
       ? new Date(sessionDate).toLocaleDateString("es-CL", {
           day: "2-digit",
@@ -35,7 +34,6 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
       0
     );
     const totalPot = globalBuyIn * players.length + totalRebuys;
-    const depositoCajaTotal = Math.max(0, totalPot - utilidad);
 
     const sorted = [...players].sort((a, b) => {
       const pnlA = a.finalChips - (globalBuyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
@@ -55,6 +53,7 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
       >
         <div className="h-1 bg-primary" />
 
+        {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div className="flex items-center gap-2.5">
             <span className="text-3xl">🎰</span>
@@ -72,49 +71,30 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
           </div>
         </div>
 
-        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3.5 mb-3 flex flex-col items-center">
-          <span className="text-[10px] text-text-secondary font-bold tracking-[0.15em] mb-1">
+        {/* POT TOTAL */}
+        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3 mb-3 flex flex-col items-center gap-0.5">
+          <span className="text-[10px] text-text-secondary font-bold tracking-[0.15em]">
             💰 POT TOTAL
           </span>
           <span className="text-[30px] font-black text-primary leading-none tabular-nums">
             {formatCLP(totalPot)}
           </span>
-          <span className="text-[10px] text-text-secondary mt-1 tracking-widest">
+          <span className="text-[10px] text-text-secondary tracking-widest">
             CLP · {players.length} jugadores
           </span>
+          {globalBuyIn > 0 && (
+            <span className="text-[10px] text-text-muted mt-0.5">
+              Buy-in: {formatCLP(globalBuyIn)} por jugador
+            </span>
+          )}
         </div>
 
-        {(utilidad > 0 || globalBuyIn > 0) && (
-          <div className="mx-3.5 mb-3 glass border border-border rounded-lg overflow-hidden">
-            <div className="flex items-center justify-between px-3 py-1.5">
-              <span className="text-[10px] text-text-secondary font-bold tracking-wider">BUY-IN</span>
-              <span className="text-[12px] font-extrabold text-text-primary tabular-nums">
-                {formatCLP(globalBuyIn)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-3 py-1.5 border-t border-border">
-              <span className="text-[10px] text-text-secondary font-bold tracking-wider">UTILIDAD CAJA</span>
-              <span className="text-[12px] font-extrabold text-warning tabular-nums">
-                {formatCLP(utilidad)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-3 py-1.5 border-t border-border emerald-glow">
-              <span className="text-[10px] text-primary font-bold tracking-wider">DEPÓSITO CAJA</span>
-              <span className="text-[12px] font-extrabold text-primary tabular-nums">
-                {formatCLP(depositoCajaTotal)}
-              </span>
-            </div>
-          </div>
-        )}
-
-        <div className="h-px bg-border mx-3.5 mb-3" />
-
+        {/* Players */}
         <div className="px-3.5 flex flex-col gap-2">
           {sorted.map((p, idx) => {
             const rebuysTotal = p.rebuys.reduce((s, r) => s + r.amount, 0);
-            const invested = globalBuyIn + rebuysTotal;
-            const pnl = p.finalChips - invested;
-            const deposito = pnl; // positive = caja paga, negative = jugador paga
+            const compras = globalBuyIn + rebuysTotal;
+            const pnl = p.finalChips - compras;
             const isWin = pnl >= 0;
             const { medal, className } = getRank(idx);
             const initials = p.name
@@ -124,14 +104,15 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
             return (
               <div
                 key={p.id}
-                className={`flex items-center gap-2 rounded-xl border p-2 ${
+                className={`rounded-xl border p-2.5 ${
                   isWin ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
                 }`}
               >
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className={`text-base font-extrabold ${className}`}>{medal}</span>
+                {/* Name row */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`text-sm font-extrabold shrink-0 ${className}`}>{medal}</span>
                   <div
-                    className={`w-9 h-9 rounded-full border-2 flex items-center justify-center ${
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       isWin ? "border-primary" : "border-crimson-light"
                     }`}
                   >
@@ -143,51 +124,54 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
                       {initials}
                     </span>
                   </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-bold text-text-primary truncate">
+                  <p className="text-[13px] font-bold text-text-primary truncate flex-1">
                     {p.name || "Jugador"}
                   </p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <div className="flex flex-col">
-                      <span className="text-[8px] text-text-muted tracking-wider">Invirtió</span>
-                      <span className="text-[10px] font-bold text-text-secondary tabular-nums">
-                        {formatCLP(invested)}
-                      </span>
-                    </div>
-                    <ArrowRight size={12} className="text-text-muted" />
-                    <div className="flex flex-col">
-                      <span className="text-[8px] text-text-muted tracking-wider">Retira</span>
-                      <span className="text-[10px] font-bold text-text-secondary tabular-nums">
-                        {formatCLP(p.finalChips)}
-                      </span>
-                    </div>
+                  <span className={`text-[11px] font-extrabold tabular-nums shrink-0 ${isWin ? "text-primary" : "text-crimson-light"}`}>
+                    {formatCLPSigned(pnl)}
+                  </span>
+                </div>
+
+                {/* Stats: Compras / Total fichas / Utilidad */}
+                <div className="grid grid-cols-3 gap-1.5">
+                  <div className="flex flex-col items-center glass border border-border rounded-md px-1 py-1.5">
+                    <span className="text-[8px] text-text-muted tracking-wider mb-0.5 font-semibold">
+                      COMPRAS
+                    </span>
+                    <span className="text-[11px] font-extrabold text-text-primary tabular-nums">
+                      {formatCLP(compras)}
+                    </span>
                   </div>
-                  {deposito !== 0 && (
-                    <p
-                      className={`text-[9px] font-bold mt-0.5 ${
+                  <div className="flex flex-col items-center glass border border-border rounded-md px-1 py-1.5">
+                    <span className="text-[8px] text-text-muted tracking-wider mb-0.5 font-semibold">
+                      TOTAL FICHAS
+                    </span>
+                    <span className="text-[11px] font-extrabold text-text-primary tabular-nums">
+                      {formatCLP(p.finalChips)}
+                    </span>
+                  </div>
+                  <div
+                    className={`flex flex-col items-center rounded-md px-1 py-1.5 ${
+                      isWin
+                        ? "bg-primary/20 border border-primary/40"
+                        : "bg-crimson-light/20 border border-crimson-light/40"
+                    }`}
+                  >
+                    <span
+                      className={`text-[8px] tracking-wider mb-0.5 font-bold ${
                         isWin ? "text-primary" : "text-crimson-light"
                       }`}
                     >
-                      {isWin ? "💳 Caja deposita: " : "💳 Paga a caja: "}
-                      {formatCLP(Math.abs(deposito))}
-                    </p>
-                  )}
-                </div>
-                <div
-                  className={`flex flex-col items-center px-2 py-1 rounded-md ${
-                    isWin ? "bg-primary/20" : "bg-crimson-light/20"
-                  }`}
-                >
-                  <span className="text-xs">{isWin ? "✅" : "❌"}</span>
-                  <span
-                    className={`text-[12px] font-extrabold tabular-nums ${
-                      isWin ? "text-primary" : "text-crimson-light"
-                    }`}
-                  >
-                    {formatCLPSigned(pnl)}
-                  </span>
-                  <span className="text-[8px] text-text-muted">CLP</span>
+                      UTILIDAD
+                    </span>
+                    <span
+                      className={`text-[11px] font-extrabold tabular-nums ${
+                        isWin ? "text-primary" : "text-crimson-light"
+                      }`}
+                    >
+                      {formatCLPSigned(pnl)}
+                    </span>
+                  </div>
                 </div>
               </div>
             );
@@ -196,6 +180,7 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
 
         <div className="h-px bg-border mx-3.5 my-3" />
 
+        {/* Winner banner */}
         {players.length > 1 && winnerPnl > 0 && (
           <div className="mx-3.5 mb-3 emerald-glow border emerald-border rounded-md py-2 px-3 text-center">
             <span className="text-[12px] font-bold text-primary">
