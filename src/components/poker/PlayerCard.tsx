@@ -224,10 +224,10 @@ export default function PlayerCard({ player }: { player: Player }) {
         }`}
       >
         <span className="text-xs text-text-secondary font-semibold w-14">Buy-in</span>
-        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2 py-1 gap-1">
-          <Coins size={14} className="text-primary" />
+        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2 py-1">
+          <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
           <span className="flex-1 text-base text-text-primary font-bold tabular-nums">
-            {hasBuyIn ? formatCLP(globalBuyIn) : "—"}
+            {hasBuyIn ? new Intl.NumberFormat("es-CL").format(globalBuyIn) : "—"}
           </span>
           <span className="text-[10px] text-text-muted">CLP</span>
         </div>
@@ -237,6 +237,7 @@ export default function PlayerCard({ player }: { player: Player }) {
           onToggle={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
           disabled={!hasBuyIn || isLocked}
         />
+        {!isLocked && <div className="w-[22px]" />}
       </div>
 
       {/* Rebuys */}
