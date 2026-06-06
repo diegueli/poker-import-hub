@@ -59,14 +59,14 @@ function ConfirmCheckbox({ confirmed, confirmedAt, onToggle, disabled }: {
   disabled?: boolean;
 }) {
   const time = confirmedAt
-    ? new Date(confirmedAt).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })
+    ? new Date(confirmedAt).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false })
     : null;
   return (
     <button
       type="button"
       onClick={disabled ? undefined : onToggle}
       disabled={disabled}
-      className={`flex items-center gap-1 rounded-md px-2 py-1.5 border w-[72px] shrink-0 justify-center text-[9px] font-bold ${
+      className={`flex items-center gap-1 rounded-md px-2 py-1.5 border w-[72px] shrink-0 justify-center text-[9px] font-bold whitespace-nowrap ${
         confirmed
           ? "bg-primary border-primary text-text-inverse"
           : "crimson-glow crimson-border text-crimson-light"
@@ -101,7 +101,7 @@ function AmountRow({
 
   return (
     <div className={`flex items-center gap-2 mx-1 my-0.5 px-3 py-2 rounded-md ${glowing ? "crimson-glow border crimson-border" : ""}`}>
-      <span className="text-xs text-text-secondary font-semibold w-14">{label}</span>
+      <span className="text-xs text-text-secondary font-semibold w-14 shrink-0 whitespace-nowrap">{label}</span>
       <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2">
         <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
         <input
@@ -268,7 +268,7 @@ export default function PlayerCard({ player }: { player: Player }) {
       <div className={`flex items-center gap-2 mx-1 my-0.5 px-3 py-2 rounded-md ${
         hasBuyIn && !player.buyInConfirmed ? "crimson-glow border crimson-border" : ""
       }`}>
-        <span className="text-xs text-text-secondary font-semibold w-14">Buy-in</span>
+        <span className="text-xs text-text-secondary font-semibold w-14 shrink-0 whitespace-nowrap">Buy-in</span>
         <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2">
           <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
           <span className="flex-1 text-base text-text-primary font-bold tabular-nums py-1">
