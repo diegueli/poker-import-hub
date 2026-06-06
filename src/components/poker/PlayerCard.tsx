@@ -119,11 +119,13 @@ function AmountRow({
         <span className="text-[10px] text-text-muted ml-1">CLP</span>
       </div>
       <ConfirmCheckbox confirmed={confirmed} confirmedAt={confirmedAt} onToggle={onToggleConfirm} disabled={disabled} />
-      {onRemove && (
-        <button onClick={onRemove} className="p-1 text-text-muted hover:text-text-primary">
-          <X size={14} />
-        </button>
-      )}
+      <button
+        onClick={onRemove ?? undefined}
+        disabled={!onRemove}
+        className={`p-1 shrink-0 ${onRemove ? "text-text-muted hover:text-text-primary" : "invisible"}`}
+      >
+        <X size={14} />
+      </button>
     </div>
   );
 }
@@ -282,7 +284,7 @@ export default function PlayerCard({ player }: { player: Player }) {
           onToggle={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
           disabled={!hasBuyIn || isLocked || player.buyInConfirmed}
         />
-        {!isLocked && !exitedEarly && <div className="w-[22px]" />}
+        <div className="w-[22px] shrink-0" />
       </div>
 
       {/* Rebuys */}
