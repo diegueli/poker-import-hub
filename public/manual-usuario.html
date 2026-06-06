@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poker Admin — Manual de Usuario</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page { size: A4; margin: 0; }
+
+body {
+  font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+  background: #111;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 6px;
+  padding: 14mm 13mm;
+  background: #0d0d14;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+}
+
+/* ── COVER ── */
+.cover {
+  background: linear-gradient(160deg, #080810 0%, #0a1a0a 55%, #080810 100%);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.cover-glow {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(34,197,94,.13) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.cover-suit    { font-size: 72px; margin-bottom: 14px; text-shadow: 0 0 40px rgba(34,197,94,.5); }
+.cover-title   { font-size: 40px; font-weight: 900; letter-spacing: .2em; color: #22c55e; text-shadow: 0 0 30px rgba(34,197,94,.4); margin-bottom: 6px; }
+.cover-sub     { font-size: 15px; color: #64748b; letter-spacing: .1em; margin-bottom: 48px; }
+.cover-badge   { font-size: 11px; color: #475569; letter-spacing: .3em; text-transform: uppercase; border: 1px solid #1e3a2e; padding: 7px 22px; border-radius: 100px; }
+.cover-icons   { display: flex; gap: 28px; justify-content: center; margin-top: 44px; }
+.cover-icon    { text-align: center; }
+.cover-icon-e  { font-size: 26px; margin-bottom: 5px; }
+.cover-icon-l  { font-size: 10px; color: #334155; }
+.cover-version { font-size: 10px; color: #1e293b; margin-top: 52px; }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex; align-items: center; gap: 11px;
+  margin-bottom: 20px; padding-bottom: 10px;
+  border-bottom: 1px solid #1a2e1a;
+}
+.section-num {
+  width: 34px; height: 34px; background: #22c55e; color: #000;
+  font-weight: 900; font-size: 15px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.section-title { font-size: 21px; font-weight: 800; color: #f1f5f9; letter-spacing: .04em; }
+
+/* ── TWO-COLUMN LAYOUT ── */
+.layout { display: flex; gap: 22px; flex: 1; align-items: flex-start; }
+.col-text { flex: 1; }
+.col-mock { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+
+/* ── STEPS ── */
+.step { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+.step-n {
+  width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px;
+  background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.35);
+  color: #22c55e; font-weight: 700; font-size: 11px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+}
+.step-t { font-size: 12.5px; color: #cbd5e1; line-height: 1.6; }
+.step-t strong { color: #f1f5f9; font-weight: 700; }
+.hl  { color: #22c55e; font-weight: 600; }
+.red { color: #ef4444; font-weight: 600; }
+
+.lead { font-size: 12.5px; color: #94a3b8; line-height: 1.65; margin-bottom: 14px; }
+
+.tip {
+  background: rgba(34,197,94,.07); border: 1px solid rgba(34,197,94,.2);
+  border-radius: 8px; padding: 9px 11px;
+  font-size: 11.5px; color: #86efac; line-height: 1.5; margin-top: 12px;
+}
+.tip::before { content: "💡 "; }
+.warn {
+  background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.2);
+  border-radius: 8px; padding: 9px 11px;
+  font-size: 11.5px; color: #fca5a5; line-height: 1.5; margin-top: 10px;
+}
+.warn::before { content: "⚠️ "; }
+
+/* ── PHONE FRAME ── */
+.phone {
+  width: 196px; background: #080808;
+  border-radius: 20px; border: 2px solid #222;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,.7), 0 0 0 1px #111;
+}
+.notch { height: 7px; background: #111; }
+
+/* ── APP TOKENS ── */
+:root {
+  --g: #22c55e; --r: #ef4444; --y: #f59e0b;
+  --bg: #080808; --sf: #111; --br: #1f1f1f;
+  --tp: #f1f5f9; --ts: #94a3b8; --tm: #475569;
+}
+
+/* Header */
+.ah { background: #111; border-bottom: 1px solid var(--br); padding: 7px 9px 5px; }
+.ah-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+.logo { display:flex; align-items:center; gap:4px; font-size:10px; font-weight:900; color:var(--tp); letter-spacing:.08em; }
+.logo-s { color:var(--g); font-size:11px; }
+.pill { display:flex; align-items:center; gap:3px; border:1px solid; border-radius:100px; padding:1px 5px; font-size:7px; font-weight:700; }
+.pill-o { color:var(--g); border-color:var(--g); }
+.pill-l { color:var(--y); border-color:var(--y); }
+.pill-s { color:#60a5fa; border-color:#60a5fa; }
+.dot { width:4px; height:4px; border-radius:50%; }
+.do { background:var(--g); } .dl { background:var(--y); } .ds { background:#60a5fa; }
+
+.pots { display:flex; gap:4px; margin-bottom:5px; }
+.pot { flex:1; border:1px solid; border-radius:5px; padding:3px 5px; display:flex; flex-direction:column; align-items:center; }
+.pot.c { border-color:rgba(34,197,94,.35); box-shadow:0 0 5px rgba(34,197,94,.12); }
+.pot.d { border-color:rgba(239,68,68,.35); box-shadow:0 0 5px rgba(239,68,68,.12); }
+.pot.n { border-color:var(--br); }
+.pl { font-size:5.5px; color:var(--ts); font-weight:700; letter-spacing:.06em; margin-bottom:1px; }
+.pa { font-size:10px; font-weight:900; color:var(--g); font-variant-numeric:tabular-nums; }
+.pa.r { color:var(--r); } .pa.m { color:var(--tm); }
+.pu { font-size:5.5px; color:var(--tm); }
+
+.lock-b { width:100%; border:1px solid var(--br); border-radius:100px; padding:2px 7px; font-size:7px; font-weight:600; color:var(--y); background:transparent; display:flex; align-items:center; justify-content:center; gap:3px; }
+
+/* Session Config */
+.sc { margin:5px 7px 3px; border:1px solid rgba(34,197,94,.35); border-radius:9px; padding:6px; box-shadow:0 0 8px rgba(34,197,94,.1); }
+.sc-t { font-size:6.5px; font-weight:800; color:var(--g); letter-spacing:.12em; margin-bottom:4px; }
+.sc-l { font-size:5.5px; color:var(--tm); font-weight:600; margin-bottom:2px; }
+.sc-f { border:1px solid var(--br); border-radius:5px; padding:3px 5px; display:flex; align-items:center; gap:2px; background:rgba(255,255,255,.02); }
+.sc-v { font-size:9px; font-weight:700; color:var(--tp); font-variant-numeric:tabular-nums; }
+.cur { font-size:6px; color:var(--tm); }
+
+/* Player Card */
+.pc { margin:3px 7px; border:1px solid var(--br); border-radius:9px; overflow:hidden; background:rgba(0,0,0,.25); }
+.pc.u { border-color:rgba(239,68,68,.45); box-shadow:0 0 7px rgba(239,68,68,.12); }
+.ph { display:flex; align-items:center; gap:5px; padding:5px 7px; }
+.av { width:26px; height:26px; border-radius:50%; border:1.5px solid var(--br); display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:800; color:var(--g); background:rgba(34,197,94,.07); flex-shrink:0; overflow:hidden; }
+.av img { width:100%; height:100%; object-fit:cover; }
+.pn { font-size:9px; font-weight:700; color:var(--tp); flex:1; }
+.pnl { font-size:8px; font-weight:800; padding:1px 4px; border-radius:3px; border:1px solid; font-variant-numeric:tabular-nums; }
+.pnl.p { color:var(--g); border-color:rgba(34,197,94,.4); }
+.pnl.n { color:var(--r); border-color:rgba(239,68,68,.4); }
+.dv { height:1px; background:var(--br); margin:0 7px; }
+
+/* Amount Row */
+.ar { display:flex; align-items:center; gap:4px; padding:4px 7px; }
+.ar.u { background:rgba(239,68,68,.05); border-radius:4px; margin:2px 4px; }
+.al { font-size:6.5px; color:var(--ts); font-weight:600; width:30px; flex-shrink:0; }
+.af { flex:1; background:rgba(255,255,255,.03); border:1px solid var(--br); border-radius:4px; padding:2px 4px; display:flex; align-items:center; gap:2px; }
+.af.u { border-color:rgba(239,68,68,.3); }
+.av2 { font-size:8.5px; font-weight:700; color:var(--tp); font-variant-numeric:tabular-nums; }
+.cb { width:22px; height:18px; border-radius:3px; border:1px solid; display:flex; align-items:center; justify-content:center; font-size:8px; flex-shrink:0; }
+.cb.ok { background:var(--g); border-color:var(--g); color:#000; }
+.cb.pend { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.4); color:var(--r); }
+
+/* Chips row */
+.cr { display:flex; align-items:center; gap:4px; padding:4px 7px; }
+.crl { font-size:6.5px; color:var(--y); font-weight:700; width:42px; flex-shrink:0; }
+.crf { flex:1; background:rgba(255,255,255,.04); border:1px solid var(--br); border-radius:4px; padding:2px 4px; display:flex; align-items:center; gap:2px; }
+
+/* Balance Widget */
+.bw { margin:5px 7px; border:1px solid; border-radius:9px; padding:7px; }
+.bw.ok { border-color:rgba(34,197,94,.45); box-shadow:0 0 8px rgba(34,197,94,.12); }
+.bw.bad { border-color:rgba(239,68,68,.45); box-shadow:0 0 8px rgba(239,68,68,.12); }
+.bt { font-size:6.5px; font-weight:800; letter-spacing:.08em; margin-bottom:4px; }
+.bt.g { color:var(--g); } .bt.r { color:var(--r); }
+.br2 { display:flex; align-items:center; gap:3px; }
+.bb { flex:1; background:rgba(255,255,255,.03); border:1px solid var(--br); border-radius:5px; padding:4px 3px; display:flex; flex-direction:column; align-items:center; }
+.bbl { font-size:5.5px; color:var(--ts); margin-bottom:1px; }
+.bba { font-size:11px; font-weight:900; color:var(--tp); font-variant-numeric:tabular-nums; }
+.beq { font-size:15px; font-weight:900; }
+.bs { margin-top:4px; border:1px solid; border-radius:5px; padding:3px; text-align:center; font-size:6.5px; font-weight:700; }
+
+/* Footer Bar */
+.fb { border-top:1px solid var(--br); background:#111; padding:5px 7px; display:flex; gap:4px; }
+.btn-r { border:1px solid rgba(239,68,68,.35); border-radius:7px; padding:5px 7px; font-size:7.5px; font-weight:700; color:var(--r); background:transparent; display:flex; align-items:center; gap:2px; }
+.btn-s { flex:1; background:#25D366; border-radius:7px; padding:5px; font-size:7px; font-weight:800; color:#fff; display:flex; align-items:center; gap:3px; justify-content:center; }
+.btn-s.off { background:rgba(255,255,255,.04); border:1px solid var(--br); color:var(--tm); }
+
+/* Empty state */
+.es { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:18px; text-align:center; }
+.es-i { font-size:32px; margin-bottom:7px; }
+.es-t { font-size:10px; font-weight:800; color:var(--tp); margin-bottom:3px; }
+.es-d { font-size:7.5px; color:var(--ts); line-height:1.5; margin-bottom:9px; }
+.es-b { background:var(--g); color:#000; border-radius:9px; padding:5px 11px; font-size:7.5px; font-weight:800; }
+
+/* Modal */
+.mo { padding:9px; background:#0a0a0a; }
+.mh { display:flex; align-items:center; justify-content:space-between; padding:5px 7px; border-bottom:1px solid var(--br); margin:-9px -9px 9px; }
+.mt { font-size:9px; font-weight:800; color:var(--tp); }
+.mf { margin-bottom:7px; }
+.ml { font-size:7px; color:var(--ts); font-weight:600; margin-bottom:3px; }
+.mi { width:100%; background:rgba(255,255,255,.03); border:1px solid var(--br); border-radius:5px; padding:4px 7px; font-size:8px; color:var(--tp); }
+.mb { width:100%; background:var(--g); color:#000; border-radius:7px; padding:5px; font-size:8px; font-weight:800; text-align:center; margin-top:8px; }
+
+/* Infographic preview */
+.ig { background:#080808; border-radius:11px; border:1px solid var(--br); padding:9px; width:196px; }
+.ig-hdr { text-align:center; margin-bottom:7px; }
+.ig-t { font-size:8.5px; font-weight:900; letter-spacing:.1em; color:var(--tp); }
+.ig-s { font-size:6.5px; color:var(--ts); }
+.ig-d { font-size:6.5px; color:var(--ts); border:1px solid var(--br); border-radius:3px; padding:2px 5px; display:inline-block; margin-top:2px; }
+.pot-box { background:rgba(34,197,94,.09); border:1px solid rgba(34,197,94,.35); border-radius:7px; padding:7px; text-align:center; margin-bottom:7px; box-shadow:0 0 8px rgba(34,197,94,.12); }
+.pbl { font-size:6.5px; color:var(--ts); font-weight:700; letter-spacing:.08em; margin-bottom:1px; }
+.pba { font-size:20px; font-weight:900; color:var(--g); font-variant-numeric:tabular-nums; }
+.pbs { font-size:6.5px; color:var(--ts); }
+.igp { border:1px solid; border-radius:7px; padding:5px; margin-bottom:4px; }
+.igp.w { border-color:rgba(34,197,94,.35); box-shadow:0 0 5px rgba(34,197,94,.1); }
+.igp.l { border-color:rgba(239,68,68,.35); box-shadow:0 0 5px rgba(239,68,68,.1); }
+.igp-top { display:flex; align-items:center; gap:4px; margin-bottom:4px; }
+.igav { width:18px; height:18px; border-radius:50%; border:1.5px solid; display:flex; align-items:center; justify-content:center; font-size:6px; font-weight:800; flex-shrink:0; overflow:hidden; }
+.igav img { width:100%; height:100%; object-fit:cover; }
+.igav.w { border-color:var(--g); color:var(--g); }
+.igav.l { border-color:var(--r); color:var(--r); }
+.ig-name { font-size:8px; font-weight:700; color:var(--tp); flex:1; }
+.ig-pnl { font-size:8px; font-weight:900; font-variant-numeric:tabular-nums; }
+.ig-pnl.w { color:var(--g); } .ig-pnl.l { color:var(--r); }
+.stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px; }
+.sc2 { border-radius:4px; padding:2px 3px; display:flex; flex-direction:column; align-items:center; border:1px solid var(--br); background:rgba(255,255,255,.02); }
+.sc2.uw { border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.09); }
+.sc2.ul { border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.09); }
+.slb { font-size:5px; color:var(--tm); font-weight:700; letter-spacing:.04em; margin-bottom:1px; }
+.slb.uw { color:var(--g); } .slb.ul { color:var(--r); }
+.slv { font-size:6.5px; font-weight:800; color:var(--tp); font-variant-numeric:tabular-nums; }
+.slv.w { color:var(--g); } .slv.l { color:var(--r); }
+
+/* TOC */
+.toc-row { display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid #141425; }
+.toc-n { width:26px; height:26px; flex-shrink:0; border-radius:50%; background:rgba(34,197,94,.09); border:1px solid rgba(34,197,94,.25); color:#22c55e; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; }
+.toc-ti { font-size:13px; font-weight:700; color:#f1f5f9; }
+.toc-de { font-size:11px; color:#64748b; margin-top:2px; }
+
+/* Workflow */
+.wf { display:flex; align-items:center; gap:0; margin:14px 0; flex-wrap:wrap; row-gap:8px; }
+.wf-s { display:flex; flex-direction:column; align-items:center; text-align:center; gap:5px; }
+.wf-i { width:40px; height:40px; border-radius:10px; background:rgba(34,197,94,.09); border:1px solid rgba(34,197,94,.25); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.wf-l { font-size:8.5px; color:#94a3b8; font-weight:600; max-width:56px; line-height:1.3; }
+.wf-a { font-size:13px; color:#253040; margin:0 3px; margin-bottom:18px; }
+
+/* Page footer */
+.pfoot { margin-top:auto; padding-top:10px; border-top:1px solid #13131f; display:flex; justify-content:space-between; align-items:center; }
+.pf-brand { font-size:9px; color:#1e293b; font-weight:700; letter-spacing:.1em; }
+.pf-num { font-size:9px; color:#1e293b; }
+
+/* Info boxes */
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+.info-box { border:1px solid; border-radius:9px; padding:12px; }
+.info-box.g { background:rgba(34,197,94,.06); border-color:rgba(34,197,94,.2); }
+.info-box.r { background:rgba(239,68,68,.06); border-color:rgba(239,68,68,.2); }
+.info-box.b { background:rgba(96,165,250,.06); border-color:rgba(96,165,250,.2); }
+.info-title { font-size:11px; font-weight:700; margin-bottom:6px; }
+.info-title.g { color:#22c55e; } .info-title.r { color:#ef4444; } .info-title.b { color:#60a5fa; }
+.info-body { font-size:11px; color:#94a3b8; line-height:1.7; }
+
+.add-p { margin:3px 7px; border:1px dashed rgba(34,197,94,.35); border-radius:9px; padding:6px; display:flex; align-items:center; justify-content:center; gap:3px; font-size:7.5px; font-weight:600; color:var(--g); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════ PORTADA ══════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-glow"></div>
+  <div class="cover-suit">♠</div>
+  <div class="cover-title">POKER ADMIN</div>
+  <div class="cover-sub">Administra tu mesa. Liquida sin errores.</div>
+  <div class="cover-badge">Manual de Usuario</div>
+  <div class="cover-icons">
+    <div class="cover-icon"><div class="cover-icon-e">🃏</div><div class="cover-icon-l">Buy-ins &amp; Rebuys</div></div>
+    <div class="cover-icon"><div class="cover-icon-e">⚖️</div><div class="cover-icon-l">Balance de Mesa</div></div>
+    <div class="cover-icon"><div class="cover-icon-e">📲</div><div class="cover-icon-l">Resumen WhatsApp</div></div>
+    <div class="cover-icon"><div class="cover-icon-e">🏆</div><div class="cover-icon-l">Podio de Ganadores</div></div>
+  </div>
+  <div class="cover-version">v1.0 · Mayo 2026</div>
+</div>
+
+<!-- ══════════════════════════════════ ÍNDICE ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div style="font-size:22px">📋</div>
+    <div class="section-title">Índice</div>
+  </div>
+  <div class="toc-row"><div class="toc-n">1</div><div><div class="toc-ti">Introducción</div><div class="toc-de">Qué es Poker Admin y flujo general de una sesión</div></div></div>
+  <div class="toc-row"><div class="toc-n">2</div><div><div class="toc-ti">Configurar el Buy-in</div><div class="toc-de">Establecer el monto de entrada igual para todos los jugadores</div></div></div>
+  <div class="toc-row"><div class="toc-n">3</div><div><div class="toc-ti">Agregar Jugadores</div><div class="toc-de">Añadir participantes con nombre y foto de perfil</div></div></div>
+  <div class="toc-row"><div class="toc-n">4</div><div><div class="toc-ti">Confirmar Pagos</div><div class="toc-de">Marcar buy-ins como recibidos en caja</div></div></div>
+  <div class="toc-row"><div class="toc-n">5</div><div><div class="toc-ti">Rebuys</div><div class="toc-de">Registrar compras adicionales durante la partida</div></div></div>
+  <div class="toc-row"><div class="toc-n">6</div><div><div class="toc-ti">Bloquear la Mesa</div><div class="toc-de">Cerrar el registro y pasar a la fase de conteo de fichas</div></div></div>
+  <div class="toc-row"><div class="toc-n">7</div><div><div class="toc-ti">Fichas Finales y Balance</div><div class="toc-de">Ingresar fichas finales y verificar que la mesa cuadre</div></div></div>
+  <div class="toc-row"><div class="toc-n">8</div><div><div class="toc-ti">Generar Resumen</div><div class="toc-de">Exportar infografía y compartir por WhatsApp</div></div></div>
+  <div class="toc-row"><div class="toc-n">9</div><div><div class="toc-ti">Resetear la Mesa</div><div class="toc-de">Iniciar una nueva sesión borrando todos los datos actuales</div></div></div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">2</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 1. INTRODUCCIÓN ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">1</div><div class="section-title">Introducción</div></div>
+  <p class="lead"><strong style="color:#f1f5f9">Poker Admin</strong> es una aplicación web para administrar sesiones de poker en casa de manera precisa y sin errores. Registra buy-ins, rebuys, confirma pagos en tiempo real, verifica el balance y genera un resumen compartible por WhatsApp al finalizar.</p>
+
+  <div style="font-size:11px;font-weight:700;color:#22c55e;letter-spacing:.1em;margin-bottom:10px">FLUJO DE UNA SESIÓN COMPLETA</div>
+  <div class="wf">
+    <div class="wf-s"><div class="wf-i">⚙️</div><div class="wf-l">Configurar buy-in</div></div><div class="wf-a">→</div>
+    <div class="wf-s"><div class="wf-i">👤</div><div class="wf-l">Agregar jugadores</div></div><div class="wf-a">→</div>
+    <div class="wf-s"><div class="wf-i">✅</div><div class="wf-l">Confirmar pagos</div></div><div class="wf-a">→</div>
+    <div class="wf-s"><div class="wf-i">🔒</div><div class="wf-l">Bloquear mesa</div></div><div class="wf-a">→</div>
+    <div class="wf-s"><div class="wf-i">🎰</div><div class="wf-l">Ingresar fichas</div></div><div class="wf-a">→</div>
+    <div class="wf-s"><div class="wf-i">📲</div><div class="wf-l">Compartir resumen</div></div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-box g">
+      <div class="info-title g">📌 Estados de la Mesa</div>
+      <div class="info-body">
+        <span style="color:#22c55e;font-weight:700">● Mesa Abierta</span> — Registro activo de jugadores y pagos<br><br>
+        <span style="color:#f59e0b;font-weight:700">● Contando Fichas</span> — Bloqueada, ingresar fichas finales<br><br>
+        <span style="color:#60a5fa;font-weight:700">● Liquidada</span> — Sesión cerrada, lista para compartir
+      </div>
+    </div>
+    <div class="info-box r">
+      <div class="info-title r">🎨 Indicadores Visuales</div>
+      <div class="info-body">
+        <span style="color:#ef4444;font-weight:700">Borde rojo</span> — Pago pendiente de confirmar<br><br>
+        <span style="color:#22c55e;font-weight:700">Borde verde</span> — Todo confirmado / Mesa cuadrada<br><br>
+        <span style="color:#f59e0b;font-weight:700">Amarillo</span> — Acción requerida o alerta
+      </div>
+    </div>
+  </div>
+
+  <div class="tip" style="margin-top:14px">La app guarda todos los datos automáticamente en el dispositivo (localStorage). Si cierras el navegador, tu sesión estará intacta al volver.</div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">3</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 2. CONFIGURAR BUY-IN ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">2</div><div class="section-title">Configurar el Buy-in</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Lo primero al iniciar una sesión es definir el <strong style="color:#f1f5f9">monto del buy-in</strong>, que será igual para todos los jugadores de la mesa.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">Abre la app. Verás la sección <strong>CONFIGURACIÓN DE MESA</strong> con borde verde en la parte superior.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Toca el campo <span class="hl">Buy-in (igual para todos)</span> e ingresa el monto en CLP usando el teclado numérico.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Toca fuera del campo para confirmar. Aparecerá un texto indicando cuánto paga cada jugador al ingresar.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">El monto queda fijo para toda la sesión. Modifícalo <strong>antes</strong> de bloquear la mesa.</div></div>
+      <div class="tip">El buy-in se aplica automáticamente a cada jugador que agregues. No necesitas ingresarlo individualmente.</div>
+      <div class="warn">Una vez que bloquees la mesa, el campo buy-in quedará deshabilitado.</div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">PANTALLA INICIAL</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="ah">
+          <div class="ah-top">
+            <div class="logo"><span class="logo-s">♠</span> POKER ADMIN</div>
+            <div class="pill pill-o"><span class="dot do"></span>Mesa Abierta</div>
+          </div>
+          <div class="pots">
+            <div class="pot c"><div class="pl">POT CONFIRMADO</div><div class="pa">$0</div><div class="pu">CLP</div></div>
+            <div style="display:flex;align-items:center;padding:0 2px;font-size:9px;color:#222">⟳</div>
+            <div class="pot n"><div class="pl">DEUDA PENDIENTE</div><div class="pa m">$0</div><div class="pu">CLP</div></div>
+          </div>
+          <div class="lock-b">🔒 Bloquear para contar fichas</div>
+        </div>
+        <div class="sc">
+          <div class="sc-t">⚙ CONFIGURACIÓN DE MESA</div>
+          <div class="sc-l">Buy-in (igual para todos)</div>
+          <div class="sc-f" style="border-color:rgba(34,197,94,.5);box-shadow:0 0 5px rgba(34,197,94,.15);">
+            <span style="font-size:8px;color:#22c55e;font-weight:700">$</span>
+            <span class="sc-v" style="color:#22c55e">35.000</span>
+            <span class="cur">CLP</span>
+          </div>
+          <div style="font-size:6px;color:#475569;text-align:center;margin-top:3px">Cada jugador paga 35.000 CLP al ingresar</div>
+        </div>
+        <div class="es">
+          <div class="es-i">♠</div>
+          <div class="es-t">Mesa vacía</div>
+          <div class="es-d">Agrega los jugadores para comenzar</div>
+          <div class="es-b">+ Agregar primer jugador</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">4</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 3. AGREGAR JUGADORES ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">3</div><div class="section-title">Agregar Jugadores</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Cada participante debe ser registrado como jugador. La app genera una tarjeta individual para cada uno con su historial de pagos.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">Toca <span class="hl">Agregar primer jugador</span> (mesa vacía) o el botón <span class="hl">+ Agregar jugador</span> al final de la lista.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Se abre un modal. Escribe el <strong>nombre del jugador</strong> en el campo de texto.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Opcional:</strong> Toca el ícono de cámara 📷 para agregar una foto desde tu galería. Aparecerá en la tarjeta y en la infografía final.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">Toca <span class="hl">Agregar Jugador</span>. La tarjeta aparecerá en la pantalla principal.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t">Repite para todos los participantes. Para eliminar uno, toca 🗑 en su tarjeta y confirma.</div></div>
+      <div class="tip">Puedes cambiar la foto de un jugador tocando su avatar circular en cualquier momento mientras la mesa esté abierta.</div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">MODAL AGREGAR JUGADOR</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="mo">
+          <div class="mh"><span style="font-size:13px;color:#64748b">✕</span><div class="mt">Agregar Jugador</div><div style="width:13px"></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:10px;">
+            <div style="width:48px;height:48px;border-radius:50%;border:2px dashed rgba(34,197,94,.4);background:rgba(34,197,94,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin-bottom:5px;">
+              <div style="font-size:13px">📷</div>
+              <div style="font-size:5.5px;color:#475569;font-weight:700">FOTO</div>
+            </div>
+            <div style="font-size:7px;color:#475569">Toca para subir foto (opcional)</div>
+          </div>
+          <div class="mf">
+            <div class="ml">NOMBRE DEL JUGADOR</div>
+            <div class="mi" style="display:flex;align-items:center;"><span style="color:#475569">Ej: Facundo García</span></div>
+          </div>
+          <div class="mb">+ Agregar Jugador</div>
+        </div>
+        <div style="background:#080808;padding:4px 0;">
+          <div class="add-p">+ Agregar jugador</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">5</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 4. CONFIRMAR PAGOS ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">4</div><div class="section-title">Confirmar Pagos</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">La app distingue entre el dinero <strong style="color:#f1f5f9">comprometido</strong> y el dinero <strong style="color:#22c55e">recibido físicamente</strong>. Debes confirmar cada pago cuando el jugador entrega el efectivo.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">En la tarjeta de cada jugador verás la fila <strong>Buy-in</strong> con un botón <span class="red">rojo ($)</span> — indica que el pago está pendiente.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Cuando el jugador entregue el dinero, toca el botón rojo. Cambia a <span class="hl">verde ✓</span> con la hora exacta de confirmación.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">El <strong>Pot Confirmado</strong> en el encabezado aumenta y la <strong>Deuda Pendiente</strong> disminuye automáticamente.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">Tarjetas con pagos pendientes muestran <span class="red">borde rojo</span> para identificarlas rápido.</div></div>
+      <div class="tip">Puedes desconfirmar tocando el botón verde si lo marcaste por error. El timestamp queda guardado para trazabilidad.</div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">TARJETAS — PAGOS</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="ah">
+          <div class="ah-top">
+            <div class="logo"><span class="logo-s">♠</span> POKER ADMIN</div>
+            <div class="pill pill-o"><span class="dot do"></span>Mesa Abierta</div>
+          </div>
+          <div class="pots">
+            <div class="pot c"><div class="pl">POT CONFIRMADO</div><div class="pa">$35.000</div><div class="pu">CLP</div></div>
+            <div style="display:flex;align-items:center;padding:0 2px;font-size:9px;color:#222">⟳</div>
+            <div class="pot d"><div class="pl">DEUDA PENDIENTE</div><div class="pa r">$35.000</div><div class="pu">CLP</div></div>
+          </div>
+        </div>
+        <!-- Player 1 confirmed -->
+        <div class="pc">
+          <div class="ph">
+            <div class="av" style="border-color:rgba(34,197,94,.5)">FA</div>
+            <div class="pn">Facundo</div>
+            <div style="color:#475569;font-size:8px">🗑</div>
+          </div>
+          <div class="dv"></div>
+          <div class="ar">
+            <div class="al">Buy-in</div>
+            <div class="af"><span style="font-size:7px;color:#22c55e">🪙</span><span class="av2">35.000</span><span class="cur">CLP</span></div>
+            <div class="cb ok" style="font-size:6px">✓ 08:15</div>
+          </div>
+        </div>
+        <!-- Player 2 pending -->
+        <div class="pc u">
+          <div class="ph">
+            <div class="av" style="border-color:rgba(239,68,68,.5);color:#ef4444">DI</div>
+            <div class="pn">Diego</div>
+            <div style="color:#475569;font-size:8px">🗑</div>
+          </div>
+          <div class="dv"></div>
+          <div class="ar u">
+            <div class="al" style="color:#ef4444">Buy-in</div>
+            <div class="af u"><span style="font-size:7px;color:#22c55e">🪙</span><span class="av2">35.000</span><span class="cur">CLP</span></div>
+            <div class="cb pend">$</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">6</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 5. REBUYS ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">5</div><div class="section-title">Rebuys</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Un <strong style="color:#f1f5f9">rebuy</strong> es una compra adicional de fichas que realiza un jugador durante la partida. Cada rebuy puede tener un monto distinto al buy-in.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">En la tarjeta del jugador, toca <span class="hl">+ Agregar Rebuy</span> en la sección de compras.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Aparece una fila <strong>Rebuy 1</strong>. Ingresa el monto de la compra adicional.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Confirma el pago tocando el botón <span class="red">$</span> cuando el jugador entregue el efectivo.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">Para múltiples rebuys repite el proceso. Se registran como <strong>Rebuy 1, Rebuy 2...</strong> con timestamps independientes.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t">Para eliminar un rebuy toca el ícono <span class="red">✕</span> al final de su fila.</div></div>
+      <div class="tip">El total de Compras (buy-in + todos los rebuys) se actualiza en tiempo real en la cabecera de la tarjeta.</div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">JUGADOR CON REBUYS</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="background:#080808">
+          <div class="pc" style="margin-top:5px">
+            <div class="ph">
+              <div class="av" style="border-color:rgba(34,197,94,.5)">MA</div>
+              <div style="flex:1"><div class="pn">Max</div><div style="font-size:6px;color:#94a3b8">Compras: $70.000 CLP</div></div>
+              <div style="color:#475569;font-size:8px;margin-left:auto">🗑</div>
+            </div>
+            <div class="dv"></div>
+            <div class="ar">
+              <div class="al">Buy-in</div>
+              <div class="af"><span style="font-size:7px;color:#22c55e">🪙</span><span class="av2">35.000</span><span class="cur">CLP</span></div>
+              <div class="cb ok" style="font-size:6px">✓ 08:05</div>
+            </div>
+            <div class="ar">
+              <div class="al">Rebuy 1</div>
+              <div class="af"><span style="font-size:7px;color:#94a3b8">$</span><span class="av2">35.000</span><span class="cur">CLP</span></div>
+              <div class="cb ok" style="font-size:6px">✓ 09:22</div>
+              <span style="color:#475569;font-size:8px;cursor:pointer">✕</span>
+            </div>
+            <div class="ar u">
+              <div class="al" style="color:#ef4444">Rebuy 2</div>
+              <div class="af u"><span style="font-size:7px;color:#94a3b8">$</span><span class="av2">35.000</span><span class="cur">CLP</span></div>
+              <div class="cb pend">$</div>
+              <span style="color:#475569;font-size:8px;cursor:pointer">✕</span>
+            </div>
+            <div style="padding:4px 7px;font-size:7.5px;color:#22c55e;font-weight:600">+ Agregar Rebuy</div>
+            <div class="dv"></div>
+            <div class="cr">
+              <div class="crl">🪙 Fichas Finales</div>
+              <div class="crf"><span style="font-size:6.5px;color:#94a3b8">$</span><span style="font-size:8px;color:#475569">0</span><span class="cur">CLP</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">7</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 6. BLOQUEAR MESA ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">6</div><div class="section-title">Bloquear la Mesa</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Cuando la partida termina y los jugadores cuentan sus fichas, bloquea la mesa para pasar a la fase de liquidación.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">En el encabezado toca <span style="color:#f59e0b;font-weight:700">🔒 Bloquear para contar fichas</span>.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">El estado cambia a <span style="color:#f59e0b;font-weight:700">● Contando Fichas</span>. El buy-in y rebuys quedan bloqueados.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Aparecen dos botones: <strong>Re-abrir mesa</strong> (corregir algo) y <strong>Liquidar sesión</strong> (cerrar cuando balance cuadre).</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">Los campos de <span class="hl">Fichas Finales</span> siguen activos para que ingreses los conteos de cada jugador.</div></div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+        <div class="info-box g" style="padding:10px">
+          <div class="info-title g" style="font-size:10px">🔓 Re-abrir Mesa</div>
+          <div class="info-body" style="font-size:10px">Vuelve al estado OPEN. Puedes editar buy-ins y rebuys nuevamente. Úsalo si hubo un error de registro.</div>
+        </div>
+        <div class="info-box b" style="padding:10px">
+          <div class="info-title b" style="font-size:10px">✅ Liquidar Sesión</div>
+          <div class="info-body" style="font-size:10px">Solo disponible cuando la mesa está balanceada. Cierra definitivamente la sesión y habilita compartir.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">MESA BLOQUEADA</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="ah">
+          <div class="ah-top">
+            <div class="logo"><span class="logo-s">♠</span> POKER ADMIN</div>
+            <div class="pill pill-l"><span class="dot dl"></span>Contando Fichas</div>
+          </div>
+          <div class="pots">
+            <div class="pot c"><div class="pl">POT CONFIRMADO</div><div class="pa">$70.000</div><div class="pu">CLP</div></div>
+            <div style="display:flex;align-items:center;padding:0 2px;font-size:9px;color:#222">⟳</div>
+            <div class="pot n"><div class="pl">DEUDA PENDIENTE</div><div class="pa m">$0</div><div class="pu">CLP</div></div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <div style="flex:1;border:1px solid #222;border-radius:100px;padding:2px 4px;font-size:6.5px;color:#94a3b8;display:flex;align-items:center;justify-content:center;gap:2px">🔓 Re-abrir mesa</div>
+            <div style="flex:1;border:1px solid rgba(34,197,94,.35);border-radius:100px;padding:2px 4px;font-size:6.5px;color:#22c55e;display:flex;align-items:center;justify-content:center;gap:2px">✓ Liquidar sesión</div>
+          </div>
+        </div>
+        <div class="sc">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="sc-t">⚙ CONFIGURACIÓN DE MESA</div>
+            <div style="border:1px solid rgba(245,158,11,.4);border-radius:100px;padding:1px 4px;font-size:5.5px;color:#f59e0b;font-weight:700">🔒 Bloqueada</div>
+          </div>
+          <div class="sc-f" style="margin-top:4px;opacity:.55">
+            <span style="font-size:7px;color:#22c55e">🪙</span>
+            <span class="sc-v">35.000</span><span class="cur">CLP</span>
+          </div>
+        </div>
+        <div class="pc" style="margin-top:3px">
+          <div class="ph">
+            <div class="av" style="border-color:rgba(34,197,94,.5)">FA</div>
+            <div class="pn">Facundo</div>
+          </div>
+          <div class="dv"></div>
+          <div class="ar">
+            <div class="al">Buy-in</div>
+            <div class="af"><span style="font-size:7px;color:#22c55e">🪙</span><span class="av2">35.000</span><span class="cur">CLP</span></div>
+            <div class="cb ok" style="font-size:6px">✓</div>
+          </div>
+          <div class="dv"></div>
+          <div class="cr">
+            <div class="crl">🪙 Fichas Finales</div>
+            <div class="crf" style="border-color:rgba(245,158,11,.35)"><span style="font-size:6.5px;color:#94a3b8">$</span><span style="font-size:8px;color:#f1f5f9;font-weight:700">_</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">8</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 7. FICHAS FINALES ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">7</div><div class="section-title">Fichas Finales y Balance</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Cada jugador cuenta sus fichas al final de la partida. Ingresa ese valor en cada tarjeta para que la app calcule resultados y verifique el balance.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">En cada tarjeta busca la fila <span style="color:#f59e0b;font-weight:700">🪙 Fichas Finales</span> en la parte inferior.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Ingresa el valor total de fichas del jugador al finalizar la partida (en CLP).</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Al ingresar fichas aparece la <strong>Utilidad</strong> del jugador: <span class="hl">positiva (ganó)</span> o <span class="red">negativa (perdió)</span>.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">El <strong>Widget de Balance</strong> al final de la lista muestra si la mesa está cuadrada. La suma de fichas finales debe igualar el total de compras.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-t">Cuando la mesa muestre <span class="hl">= verde</span>, puedes liquidar y generar el resumen.</div></div>
+      <div class="warn">Si hay descuadre, revisa si algún jugador ingresó mal su conteo. La suma total siempre debe igualar el pot total.</div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">BALANCE CUADRADO</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="background:#080808">
+          <div class="pc" style="margin-top:5px">
+            <div class="ph">
+              <div class="av" style="border-color:rgba(34,197,94,.5)">FA</div>
+              <div class="pn">Facundo</div>
+              <div class="pnl p">+$35.000</div>
+            </div>
+            <div class="dv"></div>
+            <div class="cr">
+              <div class="crl">🪙 Fichas Finales</div>
+              <div class="crf" style="border-color:rgba(245,158,11,.35)"><span style="font-size:6.5px;color:#94a3b8">$</span><span style="font-size:8px;color:#f1f5f9;font-weight:700">70.000</span><span class="cur">CLP</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:3px;margin:3px 5px 5px;padding:3px 5px;border-radius:5px;border:1px solid rgba(34,197,94,.35);background:rgba(34,197,94,.05)">
+              <span style="font-size:8px">📈</span>
+              <span style="font-size:7px;font-weight:700;color:#22c55e">Resultado Neto: +$35.000 CLP</span>
+            </div>
+          </div>
+          <div class="pc">
+            <div class="ph">
+              <div class="av" style="border-color:rgba(239,68,68,.5);color:#ef4444">DI</div>
+              <div class="pn">Diego</div>
+              <div class="pnl n">-$35.000</div>
+            </div>
+            <div class="dv"></div>
+            <div class="cr">
+              <div class="crl">🪙 Fichas Finales</div>
+              <div class="crf"><span style="font-size:6.5px;color:#94a3b8">$</span><span style="font-size:8px;color:#f1f5f9;font-weight:700">0</span><span class="cur">CLP</span></div>
+            </div>
+          </div>
+          <div class="bw ok" style="margin-top:4px">
+            <div class="bt g">⚖ BALANCE DE MESA</div>
+            <div class="br2">
+              <div class="bb"><div class="bbl">Σ Entradas</div><div class="bba" style="font-size:12px">70.000</div><div style="font-size:5.5px;color:#475569">CLP</div></div>
+              <div class="beq" style="color:#22c55e">=</div>
+              <div class="bb"><div class="bbl">Σ Fichas Finales</div><div class="bba" style="font-size:12px">70.000</div><div style="font-size:5.5px;color:#475569">CLP</div></div>
+            </div>
+            <div class="bs" style="border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.07);color:#22c55e">✓ Mesa Cuadrada — Lista para liquidar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">9</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 8. GENERAR RESUMEN ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">8</div><div class="section-title">Generar Resumen</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Con la mesa cuadrada, genera el resumen de la sesión y compártelo con todos los jugadores via WhatsApp.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">En la barra inferior toca <span class="hl">💬 Generar Resumen</span>. Solo se activa cuando la mesa está cuadrada.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">Se abre la pantalla de <strong>Resumen de Partida</strong> con la infografía completa, con jugadores ordenados por resultado.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Toca <span class="hl">Enviar texto por WhatsApp</span> para abrir WhatsApp con el resumen listo para pegar en un grupo.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t">Toca <span class="hl">Descargar imagen</span> para guardar la infografía como PNG en tu galería.</div></div>
+      <div style="margin-top:12px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);border-radius:8px;padding:11px">
+        <div style="font-size:11px;font-weight:700;color:#25D366;margin-bottom:5px">La infografía incluye:</div>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.8">♠ Fecha de la sesión · Pot total<br>♠ Foto de cada jugador (si tiene)<br>♠ Compras y fichas finales por jugador<br>♠ Utilidad (ganancia/pérdida) por jugador<br>♠ Podio 🥇🥈🥉 y ganador de la noche</div>
+      </div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">INFOGRAFÍA DE SESIÓN</div>
+      <div class="ig">
+        <div class="ig-hdr">
+          <div style="font-size:18px;margin-bottom:2px">🎰</div>
+          <div class="ig-t">RESUMEN DE SESIÓN</div>
+          <div class="ig-s">Poker Night</div>
+          <div class="ig-d">📅 02-05-2026</div>
+        </div>
+        <div class="pot-box">
+          <div class="pbl">💰 POT TOTAL</div>
+          <div class="pba">$140.000</div>
+          <div class="pbs">CLP · 4 jugadores</div>
+          <div style="font-size:6px;color:#475569;margin-top:2px">Buy-in: $35.000 por jugador</div>
+        </div>
+        <!-- Player 1 - winner with photo placeholder -->
+        <div class="igp w">
+          <div class="igp-top">
+            <span style="font-size:9px">🥇</span>
+            <div class="igav w" style="background:rgba(34,197,94,.15)">FA</div>
+            <div class="ig-name">Facundo</div>
+            <div class="ig-pnl w">+$65.000</div>
+          </div>
+          <div class="stats">
+            <div class="sc2"><div class="slb">COMPRAS</div><div class="slv">$35.000</div></div>
+            <div class="sc2"><div class="slb">TOTAL FICHAS</div><div class="slv">$100.000</div></div>
+            <div class="sc2 uw"><div class="slb uw">UTILIDAD</div><div class="slv w">+$65.000</div></div>
+          </div>
+        </div>
+        <!-- Player 2 -->
+        <div class="igp l">
+          <div class="igp-top">
+            <span style="font-size:9px">🥈</span>
+            <div class="igav l" style="background:rgba(239,68,68,.1)">MA</div>
+            <div class="ig-name">Max</div>
+            <div class="ig-pnl l">-$15.000</div>
+          </div>
+          <div class="stats">
+            <div class="sc2"><div class="slb">COMPRAS</div><div class="slv">$35.000</div></div>
+            <div class="sc2"><div class="slb">TOTAL FICHAS</div><div class="slv">$20.000</div></div>
+            <div class="sc2 ul"><div class="slb ul">UTILIDAD</div><div class="slv l">-$15.000</div></div>
+          </div>
+        </div>
+        <div style="height:1px;background:#1f1f1f;margin:5px 0"></div>
+        <div style="text-align:center;font-size:7.5px;font-weight:700;color:#22c55e">🏆 Facundo gana $65.000 CLP esta noche</div>
+        <div style="text-align:center;font-size:6.5px;color:#22c55e;margin-top:2px">✓ Mesa Cuadrada Correctamente</div>
+        <div style="text-align:center;font-size:6.5px;color:#1e293b;margin-top:5px">♠ POKER ADMIN ♠</div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">10</div></div>
+</div>
+
+<!-- ══════════════════════════════════ 9. RESETEAR ══════════════════════════════════ -->
+<div class="page">
+  <div class="section-header"><div class="section-num">9</div><div class="section-title">Resetear la Mesa</div></div>
+  <div class="layout">
+    <div class="col-text">
+      <p class="lead">Cuando quieras iniciar una <strong style="color:#f1f5f9">nueva sesión</strong>, resetea la mesa. Esta acción borra todos los datos de la sesión actual de forma permanente.</p>
+      <div class="step"><div class="step-n">1</div><div class="step-t">En la barra inferior, toca el botón <span class="red">↺ Resetear</span> (esquina izquierda).</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">El botón cambia a <span class="red">Confirmar</span> y aparece un toast con la opción Cancelar. Tienes <strong>4 segundos</strong> para confirmar.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Toca <span class="red">Confirmar</span>. Borra todos los jugadores, buy-ins y configuración. La mesa vuelve al estado inicial vacío.</div></div>
+      <div class="warn">Acción irreversible. Asegúrate de haber compartido el resumen antes de resetear.</div>
+
+      <div style="margin-top:18px">
+        <div style="font-size:11px;font-weight:700;color:#f1f5f9;margin-bottom:10px">Referencia: Barra de Acciones</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+          <div class="btn-r" style="font-size:9px">↺ Resetear</div>
+          <div style="font-size:10.5px;color:#94a3b8;line-height:1.4">Borra todos los datos.<br>Requiere doble confirmación.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+          <div class="btn-s" style="font-size:9px;flex:none;padding:5px 8px">💬 Resumen</div>
+          <div style="font-size:10.5px;color:#94a3b8;line-height:1.4">Verde cuando mesa cuadrada.<br>Habilita compartir por WhatsApp.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="btn-s off" style="font-size:9px;flex:none;padding:5px 8px">💬 Resumen</div>
+          <div style="font-size:10.5px;color:#94a3b8;line-height:1.4">Gris cuando no cuadra:<br>"Cuadra la mesa primero"</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-mock">
+      <div style="font-size:9px;color:#475569;text-align:center;margin-bottom:5px;font-weight:600">BARRA DE ACCIONES</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div style="background:#080808;padding:7px;">
+          <div style="font-size:7px;color:#475569;text-align:center;margin-bottom:6px;font-style:italic">Mesa NO cuadrada</div>
+          <div class="fb" style="margin:0 -7px">
+            <div class="btn-r">↺ Resetear</div>
+            <div class="btn-s off"><span>💬</span><div><div>Generar Resumen</div><div style="font-size:5.5px;opacity:.7">Cuadra la mesa primero</div></div></div>
+          </div>
+          <div style="height:16px"></div>
+          <div style="font-size:7px;color:#475569;text-align:center;margin-bottom:6px;font-style:italic">Mesa cuadrada ✓</div>
+          <div class="fb" style="margin:0 -7px">
+            <div class="btn-r">↺ Resetear</div>
+            <div class="btn-s"><span>💬</span><div><div>Generar Resumen</div><div style="font-size:5.5px;opacity:.8">Compartir por WhatsApp</div></div></div>
+          </div>
+          <div style="height:16px"></div>
+          <div style="font-size:7px;color:#475569;text-align:center;margin-bottom:6px;font-style:italic">Confirmación de reset</div>
+          <div class="fb" style="margin:0 -7px">
+            <div class="btn-r" style="border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)">↺ Confirmar</div>
+            <div class="btn-s off"><span>💬</span><div><div>Generar Resumen</div><div style="font-size:5.5px;opacity:.7">Cuadra la mesa primero</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><div class="pf-brand">♠ POKER ADMIN</div><div class="pf-num">11</div></div>
+</div>
+
+<!-- ══════════════════════════════════ CONTRAPORTADA ══════════════════════════════════ -->
+<div class="page cover" style="justify-content:space-between">
+  <div></div>
+  <div style="text-align:center">
+    <div style="font-size:44px;margin-bottom:10px">♠</div>
+    <div style="font-size:22px;font-weight:900;color:#22c55e;letter-spacing:.2em;margin-bottom:5px">POKER ADMIN</div>
+    <div style="font-size:12px;color:#475569;margin-bottom:30px">Administra tu mesa. Liquida sin errores.</div>
+    <div style="display:flex;gap:16px;justify-content:center;margin-bottom:28px">
+      <div style="text-align:center"><div style="font-size:22px">🃏</div><div style="font-size:9px;color:#334155;margin-top:3px">Buy-ins</div></div>
+      <div style="text-align:center"><div style="font-size:22px">✅</div><div style="font-size:9px;color:#334155;margin-top:3px">Confirmaciones</div></div>
+      <div style="text-align:center"><div style="font-size:22px">⚖️</div><div style="font-size:9px;color:#334155;margin-top:3px">Balance</div></div>
+      <div style="text-align:center"><div style="font-size:22px">📲</div><div style="font-size:9px;color:#334155;margin-top:3px">WhatsApp</div></div>
+    </div>
+    <div style="font-size:10px;color:#1e293b;line-height:2">Desarrollado con ♥ para las noches de poker<br>v1.0 · Mayo 2026</div>
+  </div>
+  <div style="font-size:14px;color:#172028;text-align:center;letter-spacing:.3em">♠ ♥ ♦ ♣</div>
+</div>
+
+</body>
+</html>
