@@ -57,8 +57,10 @@ function AmountField({
 
 export default function SessionConfig() {
   const { state, dispatch } = useSession();
-  const { globalBuyIn, sessionState } = state;
+  const { globalBuyIn, sessionState, players } = state;
   const isLocked = sessionState !== "OPEN";
+  const hasConfirmedBuyIn = players.some((p) => p.buyInConfirmed);
+  const buyInDisabled = isLocked || hasConfirmedBuyIn;
 
   return (
     <div className="mx-4 mb-3 glass border emerald-border rounded-2xl p-3 flex flex-col gap-2">
@@ -73,6 +75,12 @@ export default function SessionConfig() {
             <span className="text-[9px] font-bold text-warning">Bloqueada</span>
           </span>
         )}
+        {!isLocked && hasConfirmedBuyIn && (
+          <span className="flex items-center gap-1 border border-primary/40 rounded-full px-2 py-0.5 bg-primary/10">
+            <Lock size={10} className="text-primary" />
+            <span className="text-[9px] font-bold text-primary">Fijado</span>
+          </span>
+        )}
       </div>
 
       <AmountField
@@ -81,7 +89,7 @@ export default function SessionConfig() {
         iconColor="text-primary"
         value={globalBuyIn}
         onCommit={(v) => dispatch({ type: "SET_GLOBAL_BUYIN", payload: v })}
-        disabled={isLocked}
+        disabled={buyInDisabled}
       />
 
       {globalBuyIn > 0 && (
