@@ -88,8 +88,12 @@ function AmountRow({
   onRemove?: (() => void) | null;
   disabled?: boolean;
 }) {
+  const [focused, setFocused] = useState(false);
   const hasValue = value > 0;
   const glowing = hasValue && !confirmed;
+  const displayValue = focused
+    ? (value > 0 ? value.toString() : "")
+    : (value > 0 ? new Intl.NumberFormat("es-CL").format(value) : "");
 
   return (
     <div
@@ -103,8 +107,10 @@ function AmountRow({
         <input
           type="text"
           inputMode="numeric"
-          value={value > 0 ? value.toString() : ""}
+          value={displayValue}
           onChange={(e) => onChangeAmount(parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           placeholder="0"
           disabled={disabled}
           maxLength={9}
@@ -142,6 +148,7 @@ export default function PlayerCard({ player }: { player: Player }) {
     player.rebuys.some((r) => r.amount > 0 && !r.confirmed);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [chipsFocused, setChipsFocused] = useState(false);
 
   const handleRemove = () => {
     if (!confirmDelete) {
@@ -180,7 +187,7 @@ export default function PlayerCard({ player }: { player: Player }) {
           />
           {totalInvested > 0 && (
             <p className="text-[10px] text-text-secondary mt-0.5">
-              Invirtió {formatCLP(totalInvested)} CLP
+              Compras: {formatCLP(totalInvested)} CLP
             </p>
           )}
         </div>
@@ -217,10 +224,10 @@ export default function PlayerCard({ player }: { player: Player }) {
         }`}
       >
         <span className="text-xs text-text-secondary font-semibold w-14">Buy-in</span>
-        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2 py-1 gap-1">
-          <Coins size={14} className="text-primary" />
+        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2 py-1">
+          <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
           <span className="flex-1 text-base text-text-primary font-bold tabular-nums">
-            {hasBuyIn ? formatCLP(globalBuyIn) : "—"}
+            {hasBuyIn ? new Intl.NumberFormat("es-CL").format(globalBuyIn) : "—"}
           </span>
           <span className="text-[10px] text-text-muted">CLP</span>
         </div>
@@ -230,6 +237,7 @@ export default function PlayerCard({ player }: { player: Player }) {
           onToggle={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
           disabled={!hasBuyIn || isLocked}
         />
+        {!isLocked && <div className="w-[22px]" />}
       </div>
 
       {/* Rebuys */}
@@ -275,7 +283,11 @@ export default function PlayerCard({ player }: { player: Player }) {
           <input
             type="text"
             inputMode="numeric"
-            value={player.finalChips > 0 ? player.finalChips.toString() : ""}
+            value={
+              chipsFocused
+                ? (player.finalChips > 0 ? player.finalChips.toString() : "")
+                : (player.finalChips > 0 ? new Intl.NumberFormat("es-CL").format(player.finalChips) : "")
+            }
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_PLAYER",
@@ -286,6 +298,8 @@ export default function PlayerCard({ player }: { player: Player }) {
                 },
               })
             }
+            onFocus={() => setChipsFocused(true)}
+            onBlur={() => setChipsFocused(false)}
             placeholder="0"
             maxLength={9}
             className="flex-1 bg-transparent text-base text-text-primary font-semibold py-1 outline-none placeholder:text-text-muted min-w-0"
