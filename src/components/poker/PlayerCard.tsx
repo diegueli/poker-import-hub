@@ -280,7 +280,7 @@ export default function PlayerCard({ player }: { player: Player }) {
           confirmed={player.buyInConfirmed}
           confirmedAt={player.buyInConfirmedAt}
           onToggle={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
-          disabled={!hasBuyIn || isLocked}
+          disabled={!hasBuyIn || isLocked || player.buyInConfirmed}
         />
         {!isLocked && !exitedEarly && <div className="w-[22px]" />}
       </div>
