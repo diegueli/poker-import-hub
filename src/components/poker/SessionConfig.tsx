@@ -41,9 +41,14 @@ function AmountField({
           type="text"
           inputMode="numeric"
           value={displayValue}
-          onChange={(e) => setRaw(e.target.value.replace(/[^0-9]/g, ""))}
+          onChange={(e) => {
+            if (disabled) return;
+            const newRaw = e.target.value.replace(/[^0-9]/g, "");
+            setRaw(newRaw);
+            onCommit(parseInt(newRaw) || 0);
+          }}
           onFocus={() => setFocused(true)}
-          onBlur={() => { setFocused(false); onCommit(parseInt(raw) || 0); }}
+          onBlur={() => setFocused(false)}
           placeholder="0"
           maxLength={9}
           disabled={disabled}
