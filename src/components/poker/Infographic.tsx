@@ -1,5 +1,4 @@
 import { forwardRef } from "react";
-import { BadgeCheck } from "lucide-react";
 import { Player } from "@/context/SessionContext";
 import { formatCLP, formatCLPSigned } from "@/lib/currency";
 
@@ -11,6 +10,97 @@ const RANKS = [
 
 function getRank(idx: number) {
   return RANKS[idx] || { medal: `${idx + 1}°`, className: "text-text-secondary" };
+}
+
+type MetricCellProps = {
+  label: string;
+  value: string;
+  variant?: "default" | "win" | "loss";
+};
+
+function MetricCell({ label, value, variant = "default" }: MetricCellProps) {
+  const wrap =
+    variant === "win"
+      ? "bg-primary/10 border-primary/30"
+      : variant === "loss"
+      ? "bg-crimson-light/10 border-crimson-light/30"
+      : "bg-foreground/[0.03] border-border";
+  const valueColor =
+    variant === "win"
+      ? "text-primary"
+      : variant === "loss"
+      ? "text-crimson-light"
+      : variant === "default"
+      ? "text-text-primary"
+      : "text-text-primary";
+
+  return (
+    <div className={`flex-1 rounded-lg border px-1.5 py-1 text-center ${wrap}`}>
+      <p className="text-[8px] font-bold text-text-secondary tracking-wider mb-0.5">
+        {label}
+      </p>
+      <p className={`text-[12px] font-extrabold tabular-nums ${valueColor}`}>{value}</p>
+    </div>
+  );
+}
+
+type PlayerRowProps = { player: Player; rank: number; globalBuyIn: number };
+
+function PlayerRow({ player, rank, globalBuyIn }: PlayerRowProps) {
+  const rebuysTotal = player.rebuys.reduce((s, r) => s + r.amount, 0);
+  const compras = globalBuyIn + rebuysTotal;
+  const totalFichas = player.finalChips;
+  const utilidad = totalFichas - compras;
+  const isWin = utilidad >= 0;
+  const { medal, className } = getRank(rank);
+  const initials = player.name
+    ? player.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    : "?";
+
+  return (
+    <div
+      className={`mb-2 rounded-[10px] overflow-hidden border ${
+        isWin
+          ? "border-primary/30 bg-primary/[0.13]"
+          : "border-crimson-light/30 bg-crimson-light/[0.13]"
+      }`}
+    >
+      <div className="flex items-center gap-2 px-2 pt-2 pb-1">
+        <span className={`text-sm min-w-[20px] text-center ${className}`}>{medal}</span>
+        <div
+          className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center shrink-0 border-[1.5px] bg-foreground/[0.06] ${
+            isWin ? "border-primary" : "border-crimson-light"
+          }`}
+        >
+          {player.photo ? (
+            <img src={player.photo} alt="" className="w-7 h-7 object-cover" />
+          ) : (
+            <span
+              className={`text-[10px] font-black ${
+                isWin ? "text-primary" : "text-crimson-light"
+              }`}
+            >
+              {initials}
+            </span>
+          )}
+        </div>
+        <span className="text-[12px] font-extrabold text-text-primary flex-1 truncate">
+          {player.name || "Jugador"}
+        </span>
+        <span className="text-base">{isWin ? "✅" : "❌"}</span>
+      </div>
+
+      <div className="flex gap-1 px-2 pb-2">
+        <MetricCell label="COMPRAS" value={formatCLP(compras)} />
+        <MetricCell label="TOTAL FICHAS" value={formatCLP(totalFichas)} />
+        <MetricCell
+          label="UTILIDAD"
+          value={formatCLPSigned(utilidad)}
+          variant={isWin ? "win" : "loss"}
+        />
+      </div>
+    </div>
+  );
 }
 
 type InfographicProps = {
@@ -36,174 +126,81 @@ const Infographic = forwardRef<HTMLDivElement, InfographicProps>(
     const totalPot = globalBuyIn * players.length + totalRebuys;
 
     const sorted = [...players].sort((a, b) => {
-      const pnlA = a.finalChips - (globalBuyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
-      const pnlB = b.finalChips - (globalBuyIn + b.rebuys.reduce((s, r) => s + r.amount, 0));
-      return pnlB - pnlA;
+      const ua =
+        a.finalChips - (globalBuyIn + a.rebuys.reduce((s, r) => s + r.amount, 0));
+      const ub =
+        b.finalChips - (globalBuyIn + b.rebuys.reduce((s, r) => s + r.amount, 0));
+      return ub - ua;
     });
 
     const winner = sorted[0];
-    const winnerPnl = winner
-      ? winner.finalChips - (globalBuyIn + winner.rebuys.reduce((s, r) => s + r.amount, 0))
+    const winnerUtil = winner
+      ? winner.finalChips -
+        (globalBuyIn + winner.rebuys.reduce((s, r) => s + r.amount, 0))
       : 0;
 
     return (
       <div
         ref={ref}
-        className="bg-background rounded-2xl overflow-hidden border border-border w-[360px]"
+        className="w-[340px] bg-background rounded-[18px] overflow-hidden border border-border"
       >
+        {/* Top bar */}
         <div className="h-1 bg-primary" />
 
         {/* Header */}
-        <div className="flex flex-col items-center px-4 pt-4 pb-3 gap-1">
-          <span className="text-3xl">🎰</span>
-          <h3 className="text-[14px] font-black text-text-primary tracking-[0.15em]">
-            RESUMEN DE SESIÓN
-          </h3>
-          <p className="text-[11px] font-medium text-text-secondary tracking-wider">
-            Poker Night
-          </p>
-          <div className="bg-foreground/[0.06] rounded-md px-2.5 py-1 border border-border mt-1">
-            <span className="text-[11px] font-semibold text-text-secondary">📅 {date}</span>
+        <div className="flex items-center gap-2.5 px-3.5 pt-3.5 pb-3 border-b border-border">
+          <span className="text-[28px] leading-none">🎰</span>
+          <div className="flex-1">
+            <p className="text-[14px] font-black text-text-primary tracking-[0.12em]">
+              RESUMEN DE SESIÓN
+            </p>
+            <p className="text-[11px] text-text-secondary font-medium mt-0.5">
+              Poker Night · {date}
+            </p>
+          </div>
+          <div className="emerald-glow border emerald-border rounded-[10px] px-2.5 py-1.5 text-center">
+            <p className="text-[8px] text-text-secondary font-bold tracking-wider">
+              POT TOTAL
+            </p>
+            <p className="text-[14px] font-black text-primary mt-0.5 tabular-nums">
+              {formatCLP(totalPot)}
+            </p>
+            <p className="text-[8px] text-text-muted tracking-wide">
+              {players.length} jugadores
+            </p>
           </div>
         </div>
 
-        {/* POT TOTAL */}
-        <div className="emerald-glow border emerald-border mx-3.5 rounded-xl py-3 mb-3 flex flex-col items-center gap-0.5">
-          <span className="text-[10px] text-text-secondary font-bold tracking-[0.15em]">
-            💰 POT TOTAL
-          </span>
-          <span className="text-[30px] font-black text-primary leading-none tabular-nums">
-            {formatCLP(totalPot)}
-          </span>
-          <span className="text-[10px] text-text-secondary tracking-widest">
-            CLP · {players.length} jugadores
-          </span>
-          {globalBuyIn > 0 && (
-            <span className="text-[10px] text-text-muted mt-0.5">
-              Buy-in: {formatCLP(globalBuyIn)} por jugador
-            </span>
-          )}
-        </div>
-
         {/* Players */}
-        <div className="px-3.5 flex flex-col gap-2">
-          {sorted.map((p, idx) => {
-            const rebuysTotal = p.rebuys.reduce((s, r) => s + r.amount, 0);
-            const compras = globalBuyIn + rebuysTotal;
-            const pnl = p.finalChips - compras;
-            const isWin = pnl >= 0;
-            const { medal, className } = getRank(idx);
-            const initials = p.name
-              ? p.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
-              : "?";
-
-            return (
-              <div
-                key={p.id}
-                className={`rounded-xl border p-2.5 ${
-                  isWin ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
-                }`}
-              >
-                {/* Name row */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-sm font-extrabold shrink-0 ${className}`}>{medal}</span>
-                  <div
-                    className={`w-9 h-9 rounded-full border-2 shrink-0 overflow-hidden flex items-center justify-center ${
-                      isWin ? "border-primary" : "border-crimson-light"
-                    }`}
-                  >
-                    {p.photo ? (
-                      <img
-                        src={p.photo}
-                        alt={p.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span
-                        className={`text-xs font-extrabold ${
-                          isWin ? "text-primary" : "text-crimson-light"
-                        }`}
-                      >
-                        {initials}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[13px] font-bold text-text-primary truncate flex-1">
-                    {p.name || "Jugador"}
-                  </p>
-                  <span className={`text-[11px] font-extrabold tabular-nums shrink-0 ${isWin ? "text-primary" : "text-crimson-light"}`}>
-                    {formatCLPSigned(pnl)}
-                  </span>
-                </div>
-
-                {/* Stats: Compras / Total fichas / Utilidad */}
-                <div className="grid grid-cols-3 gap-1.5">
-                  <div className="flex flex-col items-center glass border border-border rounded-md px-1 py-1.5">
-                    <span className="text-[8px] text-text-muted tracking-wider mb-0.5 font-semibold">
-                      COMPRAS
-                    </span>
-                    <span className="text-[11px] font-extrabold text-text-primary tabular-nums">
-                      {formatCLP(compras)}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center glass border border-border rounded-md px-1 py-1.5">
-                    <span className="text-[8px] text-text-muted tracking-wider mb-0.5 font-semibold">
-                      TOTAL FICHAS
-                    </span>
-                    <span className="text-[11px] font-extrabold text-text-primary tabular-nums">
-                      {formatCLP(p.finalChips)}
-                    </span>
-                  </div>
-                  <div
-                    className={`flex flex-col items-center rounded-md px-1 py-1.5 ${
-                      isWin
-                        ? "bg-primary/20 border border-primary/40"
-                        : "bg-crimson-light/20 border border-crimson-light/40"
-                    }`}
-                  >
-                    <span
-                      className={`text-[8px] tracking-wider mb-0.5 font-bold ${
-                        isWin ? "text-primary" : "text-crimson-light"
-                      }`}
-                    >
-                      UTILIDAD
-                    </span>
-                    <span
-                      className={`text-[11px] font-extrabold tabular-nums ${
-                        isWin ? "text-primary" : "text-crimson-light"
-                      }`}
-                    >
-                      {formatCLPSigned(pnl)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="px-3 pt-2.5 pb-1">
+          {sorted.map((p, i) => (
+            <PlayerRow key={p.id} player={p} rank={i} globalBuyIn={globalBuyIn} />
+          ))}
         </div>
-
-        <div className="h-px bg-border mx-3.5 my-3" />
 
         {/* Winner banner */}
-        {players.length > 1 && winnerPnl > 0 && (
-          <div className="mx-3.5 mb-3 emerald-glow border emerald-border rounded-md py-2 px-3 text-center">
-            <span className="text-[12px] font-bold text-primary">
-              🏆 {winner.name} gana {formatCLP(winnerPnl)} CLP esta noche
+        {players.length > 1 && winnerUtil > 0 && (
+          <div className="mx-3 mb-2.5 rounded-lg py-2 px-3 text-center bg-gold/10 border border-gold/30">
+            <span className="text-[12px] font-bold text-gold">
+              🏆 {winner.name} gana {formatCLP(winnerUtil)} CLP esta noche
             </span>
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-1.5 mb-3">
-          <BadgeCheck size={14} className="text-primary" />
-          <span className="text-[11px] text-primary font-semibold">
-            Mesa Cuadrada Correctamente
+        {/* Status */}
+        <div className="flex items-center justify-center gap-1.5 mb-2">
+          <span className="text-[11px] text-primary font-bold">
+            ✔ Mesa Cuadrada Correctamente
           </span>
         </div>
 
-        <div className="flex items-center justify-center gap-2 pb-3.5 text-text-muted">
-          <span className="text-base">♠</span>
-          <span className="text-[11px] font-bold tracking-[0.2em]">POKER ADMIN</span>
-          <span className="text-base">♠</span>
+        {/* Branding */}
+        <div className="flex items-center justify-center gap-2 pb-3 text-text-muted">
+          <span className="text-[10px]">♠</span>
+          <span className="text-[9px] font-extrabold tracking-[0.25em]">
+            POKER ADMIN
+          </span>
+          <span className="text-[10px]">♠</span>
         </div>
       </div>
     );
