@@ -18,6 +18,8 @@ export type Player = {
   buyInConfirmedAt: string | null;
   rebuys: Rebuy[];
   finalChips: number;
+  exitedEarly: boolean;
+  exitedAt: string | null;
 };
 
 export type SessionStateName = "OPEN" | "LOCKED" | "SETTLED";
@@ -41,7 +43,9 @@ type Action =
   | { type: "ADD_REBUY"; payload: string }
   | { type: "REMOVE_REBUY"; payload: { playerId: string; rebuyId: string } }
   | { type: "UPDATE_REBUY"; payload: { playerId: string; rebuyId: string; amount: number } }
-  | { type: "TOGGLE_REBUY_CONFIRMED"; payload: { playerId: string; rebuyId: string } };
+  | { type: "TOGGLE_REBUY_CONFIRMED"; payload: { playerId: string; rebuyId: string } }
+  | { type: "SET_EARLY_EXIT"; payload: { id: string; finalChips: number } }
+  | { type: "UNDO_EARLY_EXIT"; payload: string };
 
 function makePlayer(name = "", photo: string | null = null): Player {
   return {
@@ -52,6 +56,8 @@ function makePlayer(name = "", photo: string | null = null): Player {
     buyInConfirmedAt: null,
     rebuys: [],
     finalChips: 0,
+    exitedEarly: false,
+    exitedAt: null,
   };
 }
 
@@ -143,6 +149,25 @@ function reducer(state: State, action: Action): State {
         }),
       };
     }
+    case "SET_EARLY_EXIT": {
+      const { id, finalChips } = action.payload;
+      const now = new Date().toISOString();
+      return {
+        ...state,
+        players: state.players.map((p) =>
+          p.id === id ? { ...p, exitedEarly: true, exitedAt: now, finalChips } : p
+        ),
+      };
+    }
+    case "UNDO_EARLY_EXIT":
+      return {
+        ...state,
+        players: state.players.map((p) =>
+          p.id === action.payload
+            ? { ...p, exitedEarly: false, exitedAt: null, finalChips: 0 }
+            : p
+        ),
+      };
     default:
       return state;
   }
