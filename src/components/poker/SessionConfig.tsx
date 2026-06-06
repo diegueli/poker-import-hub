@@ -18,10 +18,16 @@ function AmountField({
   disabled?: boolean;
 }) {
   const [raw, setRaw] = useState(value > 0 ? value.toString() : "");
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     setRaw(value > 0 ? value.toString() : "");
   }, [value]);
+
+  const parsed = parseInt(raw) || 0;
+  const displayValue = focused
+    ? raw
+    : (parsed > 0 ? new Intl.NumberFormat("es-CL").format(parsed) : "");
 
   return (
     <div className="flex flex-col gap-1">
@@ -34,9 +40,10 @@ function AmountField({
         <input
           type="text"
           inputMode="numeric"
-          value={raw}
+          value={displayValue}
           onChange={(e) => setRaw(e.target.value.replace(/[^0-9]/g, ""))}
-          onBlur={() => onCommit(parseInt(raw) || 0)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => { setFocused(false); onCommit(parseInt(raw) || 0); }}
           placeholder="0"
           maxLength={9}
           disabled={disabled}
