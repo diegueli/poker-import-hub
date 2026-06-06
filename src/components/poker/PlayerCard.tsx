@@ -66,7 +66,7 @@ function ConfirmCheckbox({ confirmed, confirmedAt, onToggle, disabled }: {
       type="button"
       onClick={disabled ? undefined : onToggle}
       disabled={disabled}
-      className={`flex items-center gap-1 rounded-md px-2 py-1.5 border min-w-[32px] justify-center text-[9px] font-bold ${
+      className={`flex items-center gap-1 rounded-md px-2 py-1.5 border w-[72px] shrink-0 justify-center text-[9px] font-bold ${
         confirmed
           ? "bg-primary border-primary text-text-inverse"
           : "crimson-glow crimson-border text-crimson-light"
@@ -269,12 +269,12 @@ export default function PlayerCard({ player }: { player: Player }) {
         hasBuyIn && !player.buyInConfirmed ? "crimson-glow border crimson-border" : ""
       }`}>
         <span className="text-xs text-text-secondary font-semibold w-14">Buy-in</span>
-        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2 py-1">
+        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2">
           <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
-          <span className="flex-1 text-base text-text-primary font-bold tabular-nums">
+          <span className="flex-1 text-base text-text-primary font-bold tabular-nums py-1">
             {hasBuyIn ? new Intl.NumberFormat("es-CL").format(globalBuyIn) : "—"}
           </span>
-          <span className="text-[10px] text-text-muted">CLP</span>
+          <span className="text-[10px] text-text-muted ml-1">CLP</span>
         </div>
         <ConfirmCheckbox
           confirmed={player.buyInConfirmed}
