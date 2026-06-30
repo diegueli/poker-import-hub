@@ -6,7 +6,18 @@ import {
 import { useSession, Player } from "@/context/SessionContext";
 import { formatCLP, formatCLPSigned } from "@/lib/currency";
 
-// ── Avatar ──────────────────────────────────────────────────────────────────
+// ── SectionDivider ───────────────────────────────────────────────────────────
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 px-4 py-1">
+      <div className="h-px flex-1 bg-white/[0.06]" />
+      <span className="text-[8px] font-bold tracking-[0.2em] text-text-muted uppercase">{label}</span>
+      <div className="h-px flex-1 bg-white/[0.06]" />
+    </div>
+  );
+}
+
+// ── Avatar ───────────────────────────────────────────────────────────────────
 function Avatar({ name, photo, onPhotoChange, disabled }: {
   name: string;
   photo: string | null;
@@ -35,14 +46,17 @@ function Avatar({ name, photo, onPhotoChange, disabled }: {
       disabled={disabled}
     >
       {photo ? (
-        <img src={photo} alt={name} className="w-11 h-11 rounded-full object-cover border-2 border-primary" />
+        <img
+          src={photo} alt={name}
+          className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/40"
+        />
       ) : (
-        <div className="w-11 h-11 rounded-full glass-medium border-2 border-border flex items-center justify-center">
-          <span className="text-base font-extrabold text-primary tracking-wider">{initials}</span>
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/25 to-primary/10 border border-primary/30 flex items-center justify-center">
+          <span className="text-base font-extrabold text-primary">{initials}</span>
         </div>
       )}
       {!disabled && (
-        <span className="absolute bottom-0 right-0 bg-primary rounded-full w-3.5 h-3.5 flex items-center justify-center">
+        <span className="absolute bottom-0 right-0 bg-primary rounded-full w-4 h-4 flex items-center justify-center shadow-lg">
           <Camera size={8} className="text-text-inverse" />
         </span>
       )}
@@ -51,8 +65,8 @@ function Avatar({ name, photo, onPhotoChange, disabled }: {
   );
 }
 
-// ── ConfirmCheckbox ──────────────────────────────────────────────────────────
-function ConfirmCheckbox({ confirmed, confirmedAt, onToggle, disabled }: {
+// ── ConfirmChip ──────────────────────────────────────────────────────────────
+function ConfirmChip({ confirmed, confirmedAt, onToggle, disabled }: {
   confirmed: boolean;
   confirmedAt: string | null;
   onToggle: () => void;
@@ -66,19 +80,19 @@ function ConfirmCheckbox({ confirmed, confirmedAt, onToggle, disabled }: {
       type="button"
       onClick={disabled ? undefined : onToggle}
       disabled={disabled}
-      className={`flex items-center gap-1 rounded-md px-2 py-1.5 border w-[72px] shrink-0 justify-center text-[9px] font-bold whitespace-nowrap ${
+      className={`flex items-center gap-1 rounded-lg px-2 py-1.5 border w-[72px] shrink-0 justify-center text-[9px] font-bold whitespace-nowrap transition-all ${
         confirmed
-          ? "bg-primary border-primary text-text-inverse"
+          ? "teal-glow teal-border text-teal-light"
           : "crimson-glow crimson-border text-crimson-light"
-      }`}
+      } ${disabled ? "opacity-60" : ""}`}
     >
-      {confirmed ? <Check size={14} /> : <DollarSign size={12} />}
+      {confirmed ? <Check size={13} /> : <DollarSign size={11} />}
       {time && <span>{time}</span>}
     </button>
   );
 }
 
-// ── AmountRow (rebuy editable) ───────────────────────────────────────────────
+// ── AmountRow ────────────────────────────────────────────────────────────────
 function AmountRow({
   label, value, confirmed, confirmedAt,
   onChangeAmount, onToggleConfirm, onRemove, disabled,
@@ -100,9 +114,9 @@ function AmountRow({
     : (value > 0 ? new Intl.NumberFormat("es-CL").format(value) : "");
 
   return (
-    <div className={`flex items-center gap-2 mx-1 my-0.5 px-3 py-2 rounded-md ${glowing ? "crimson-glow border crimson-border" : ""}`}>
+    <div className={`flex items-center gap-2 mx-2 my-0.5 px-2 py-1.5 rounded-xl ${glowing ? "crimson-glow border crimson-border" : ""}`}>
       <span className="text-xs text-text-secondary font-semibold w-14 shrink-0 whitespace-nowrap">{label}</span>
-      <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2">
+      <div className="flex-1 flex items-center glass-medium border border-white/[0.08] rounded-lg px-2">
         <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
         <input
           type="text"
@@ -114,15 +128,15 @@ function AmountRow({
           placeholder="0"
           disabled={disabled}
           maxLength={9}
-          className="flex-1 bg-transparent text-base text-text-primary font-semibold py-1 outline-none placeholder:text-text-muted disabled:text-text-secondary min-w-0"
+          className="flex-1 bg-transparent text-sm text-text-primary font-semibold py-1.5 outline-none placeholder:text-text-muted disabled:text-text-secondary min-w-0"
         />
         <span className="text-[10px] text-text-muted ml-1">CLP</span>
       </div>
-      <ConfirmCheckbox confirmed={confirmed} confirmedAt={confirmedAt} onToggle={onToggleConfirm} disabled={disabled} />
+      <ConfirmChip confirmed={confirmed} confirmedAt={confirmedAt} onToggle={onToggleConfirm} disabled={disabled} />
       <button
         onClick={onRemove ?? undefined}
         disabled={!onRemove}
-        className={`p-1 shrink-0 ${onRemove ? "text-text-muted hover:text-text-primary" : "invisible"}`}
+        className={`p-1 shrink-0 rounded-md transition-colors ${onRemove ? "text-text-muted hover:text-crimson-light hover:bg-crimson-light/10" : "invisible"}`}
       >
         <X size={14} />
       </button>
@@ -148,27 +162,25 @@ function EarlyExitModal({ player, globalBuyIn, onConfirm, onCancel }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-6" onClick={onCancel}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative glass border border-border rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
+        className="relative glass border border-white/10 rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-[0_12px_50px_rgba(0,0,0,0.7)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Icon + title */}
         <div className="flex flex-col items-center gap-2">
-          <div className="w-12 h-12 rounded-full bg-warning/10 border border-warning/40 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full warning-glow border border-warning/40 flex items-center justify-center">
             <LogOut size={22} className="text-warning" />
           </div>
           <h3 className="text-lg font-extrabold text-text-primary">Salida anticipada</h3>
           <p className="text-sm text-text-secondary text-center leading-relaxed">
-            <strong className="text-text-primary">{player.name || "Este jugador"}</strong> se retira de la mesa.
-            Ingresa sus fichas finales para registrar el resultado.
+            <strong className="text-text-primary">{player.name || "Este jugador"}</strong> se retira.
+            Ingresa sus fichas al salir.
           </p>
         </div>
 
-        {/* Chips input */}
         <div>
           <div className="text-[10px] text-text-secondary font-bold tracking-wider mb-1.5">FICHAS AL RETIRARSE</div>
-          <div className="flex items-center glass-medium border border-border rounded-xl px-3 py-2.5">
+          <div className="flex items-center glass-medium border border-white/10 rounded-xl px-3 py-2.5">
             <span className="text-lg text-text-secondary font-bold mr-1">$</span>
             <input
               type="text"
@@ -186,25 +198,23 @@ function EarlyExitModal({ player, globalBuyIn, onConfirm, onCancel }: {
           </div>
         </div>
 
-        {/* P&L preview */}
         {parsed > 0 && compras > 0 && (
           <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${
-            pnl >= 0 ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
+            pnl >= 0 ? "teal-glow teal-border" : "crimson-glow crimson-border"
           }`}>
             {pnl >= 0
-              ? <TrendingUp size={16} className="text-primary" />
+              ? <TrendingUp size={16} className="text-teal-light" />
               : <TrendingDown size={16} className="text-crimson-light" />}
-            <span className={`text-sm font-bold ${pnl >= 0 ? "text-primary" : "text-crimson-light"}`}>
+            <span className={`text-sm font-bold ${pnl >= 0 ? "text-teal-light" : "text-crimson-light"}`}>
               Resultado: {formatCLPSigned(pnl)} CLP
             </span>
           </div>
         )}
 
-        {/* Actions */}
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-2xl border border-border text-text-secondary font-bold text-sm hover:glass-medium transition"
+            className="flex-1 py-3 rounded-2xl border border-white/10 text-text-secondary font-bold text-sm hover:glass-medium transition"
           >
             Cancelar
           </button>
@@ -213,8 +223,8 @@ function EarlyExitModal({ player, globalBuyIn, onConfirm, onCancel }: {
             disabled={parsed === 0}
             className={`flex-1 py-3 rounded-2xl font-extrabold text-sm transition ${
               parsed > 0
-                ? "warning-glow border border-warning text-warning"
-                : "glass border border-border text-text-muted cursor-not-allowed"
+                ? "warning-glow border border-warning/50 text-warning"
+                : "glass border border-white/10 text-text-muted cursor-not-allowed"
             }`}
           >
             Confirmar salida
@@ -246,7 +256,7 @@ export default function PlayerCard({ player }: { player: Player }) {
 
   const exitedEarly = player.exitedEarly ?? false;
   const exitTime = player.exitedAt
-    ? new Date(player.exitedAt).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })
+    ? new Date(player.exitedAt).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false })
     : null;
 
   const handleRemove = () => {
@@ -263,22 +273,22 @@ export default function PlayerCard({ player }: { player: Player }) {
     setExitModal(false);
   };
 
-  // ── Payment rows (shared between normal + early-exit views) ──────────────
+  // ── Payment rows (shared) ─────────────────────────────────────────────────
   const paymentRows = (
     <>
       {/* Buy-in */}
-      <div className={`flex items-center gap-2 mx-1 my-0.5 px-3 py-2 rounded-md ${
+      <div className={`flex items-center gap-2 mx-2 my-0.5 px-2 py-1.5 rounded-xl ${
         hasBuyIn && !player.buyInConfirmed ? "crimson-glow border crimson-border" : ""
       }`}>
         <span className="text-xs text-text-secondary font-semibold w-14 shrink-0 whitespace-nowrap">Buy-in</span>
-        <div className="flex-1 flex items-center glass-medium border border-border rounded-md px-2">
+        <div className="flex-1 flex items-center glass-medium border border-white/[0.08] rounded-lg px-2">
           <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
-          <span className="flex-1 text-base text-text-primary font-bold tabular-nums py-1">
+          <span className="flex-1 text-sm text-text-primary font-semibold tabular-nums py-1.5">
             {hasBuyIn ? new Intl.NumberFormat("es-CL").format(globalBuyIn) : "—"}
           </span>
           <span className="text-[10px] text-text-muted ml-1">CLP</span>
         </div>
-        <ConfirmCheckbox
+        <ConfirmChip
           confirmed={player.buyInConfirmed}
           confirmedAt={player.buyInConfirmedAt}
           onToggle={() => dispatch({ type: "TOGGLE_BUYIN_CONFIRMED", payload: player.id })}
@@ -313,89 +323,75 @@ export default function PlayerCard({ player }: { player: Player }) {
   // ── EARLY EXIT card ──────────────────────────────────────────────────────
   if (exitedEarly) {
     return (
-      <div className={`glass border rounded-2xl mx-4 mb-3 overflow-hidden opacity-80 ${
-        hasUnconfirmed ? "crimson-border shadow-crimson-card" : "border-border"
+      <div className={`rounded-2xl mx-4 mb-3 overflow-hidden border ${
+        hasUnconfirmed ? "crimson-border shadow-crimson-card" : "border-white/[0.09]"
       }`}>
-        {/* Header */}
-        <div className="flex items-center gap-2 p-3">
+        <div className="h-[3px] bg-warning/50" />
+
+        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-warning/[0.08] to-transparent">
           <Avatar name={player.name} photo={player.photo} disabled onPhotoChange={() => {}} />
           <div className="flex-1 min-w-0">
-            <p className="text-base font-bold text-text-primary truncate">
-              {player.name || "Jugador"}
-            </p>
+            <p className="text-[15px] font-bold text-text-primary truncate">{player.name || "Jugador"}</p>
             {totalInvested > 0 && (
-              <p className="text-[10px] text-text-secondary mt-0.5">
-                Compras: {formatCLP(totalInvested)} CLP
-              </p>
+              <p className="text-[10px] text-text-secondary mt-0.5">Compras: {formatCLP(totalInvested)} CLP</p>
             )}
           </div>
-          {/* SALIÓ badge */}
-          <div className="flex items-center gap-1 border border-warning/40 rounded-full px-2 py-0.5 bg-warning/10 shrink-0">
-            <LogOut size={10} className="text-warning" />
-            <span className="text-[9px] font-bold text-warning">
-              SALIÓ{exitTime ? ` ${exitTime}` : ""}
-            </span>
+          <div className="flex items-center gap-1 border border-warning/40 rounded-full px-2 py-1 warning-glow shrink-0">
+            <LogOut size={9} className="text-warning" />
+            <span className="text-[9px] font-bold text-warning">SALIÓ{exitTime ? ` ${exitTime}` : ""}</span>
           </div>
-          {/* P&L badge */}
           {hasFinalChips && (
-            <div className={`rounded-md px-2 py-0.5 border shrink-0 ${
-              pnl >= 0 ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
+            <div className={`rounded-lg px-2 py-1 border shrink-0 ${
+              pnl >= 0 ? "teal-glow teal-border" : "crimson-glow crimson-border"
             }`}>
-              <span className={`text-xs font-extrabold ${pnl >= 0 ? "text-primary" : "text-crimson-light"}`}>
+              <span className={`text-xs font-extrabold ${pnl >= 0 ? "text-teal-light" : "text-crimson-light"}`}>
                 {formatCLPSigned(pnl)}
               </span>
             </div>
           )}
           <button
             onClick={handleRemove}
-            className={`p-1 ${confirmDelete ? "text-crimson-light" : "text-text-muted"} hover:text-crimson-light shrink-0`}
-            title={confirmDelete ? "Confirmar" : "Eliminar"}
+            className={`p-1.5 rounded-md transition-colors shrink-0 ${
+              confirmDelete ? "text-crimson-light bg-crimson-light/10" : "text-text-muted hover:text-crimson-light"
+            }`}
           >
-            <Trash2 size={18} />
+            <Trash2 size={15} />
           </button>
         </div>
 
-        <div className="h-px bg-border mx-3" />
-
-        {/* Payment rows (still confirmable) */}
+        <SectionDivider label="Pagos" />
         {paymentRows}
 
-        <div className="h-px bg-border mx-3" />
-
-        {/* Final chips (frozen display) */}
-        <div className="flex items-center gap-2 px-3 py-2">
-          <Coins size={18} className="text-warning" />
-          <span className="text-xs font-bold text-warning w-24">Fichas Finales</span>
-          <div className="flex-1 flex items-center glass-strong border border-border rounded-md px-2 py-1">
-            <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
-            <span className="flex-1 text-base text-text-primary font-semibold tabular-nums">
+        <SectionDivider label="Fichas Finales" />
+        <div className="px-4 pb-3">
+          <div className="flex items-center glass-strong border border-white/[0.08] rounded-xl px-3">
+            <Coins size={15} className="text-warning mr-2 shrink-0" />
+            <span className="flex-1 text-base text-text-primary font-bold tabular-nums py-2.5">
               {hasFinalChips ? new Intl.NumberFormat("es-CL").format(player.finalChips) : "0"}
             </span>
-            <span className="text-[10px] text-text-muted ml-1">CLP</span>
+            <span className="text-[10px] text-text-muted">CLP</span>
           </div>
+
+          {hasFinalChips && totalInvested > 0 && (
+            <div className={`mt-2 flex items-center gap-2 px-3 py-2 rounded-xl border ${
+              pnl >= 0 ? "teal-glow teal-border" : "crimson-glow crimson-border"
+            }`}>
+              {pnl >= 0
+                ? <TrendingUp size={14} className="text-teal-light" />
+                : <TrendingDown size={14} className="text-crimson-light" />}
+              <span className={`text-xs font-bold ${pnl >= 0 ? "text-teal-light" : "text-crimson-light"}`}>
+                Resultado: {formatCLPSigned(pnl)} CLP
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Net result */}
-        {hasFinalChips && totalInvested > 0 && (
-          <div className={`flex items-center gap-2 mx-3 px-3 py-2 rounded-md border ${
-            pnl >= 0 ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
-          }`}>
-            {pnl >= 0
-              ? <TrendingUp size={16} className="text-primary" />
-              : <TrendingDown size={16} className="text-crimson-light" />}
-            <span className={`text-sm font-bold ${pnl >= 0 ? "text-primary" : "text-crimson-light"}`}>
-              Resultado Neto: {formatCLPSigned(pnl)} CLP
-            </span>
-          </div>
-        )}
-
-        {/* Undo — only when table is still open */}
         {!isLocked && (
           <button
             onClick={() => dispatch({ type: "UNDO_EARLY_EXIT", payload: player.id })}
-            className="flex items-center justify-center gap-1.5 w-full py-2 text-xs text-text-muted font-semibold hover:text-text-secondary transition"
+            className="flex items-center justify-center gap-1.5 w-full py-2 text-xs text-text-muted font-semibold hover:text-text-secondary transition border-t border-white/[0.06]"
           >
-            <Undo2 size={13} /> Deshacer salida
+            <Undo2 size={12} /> Deshacer salida
           </button>
         )}
       </div>
@@ -405,11 +401,14 @@ export default function PlayerCard({ player }: { player: Player }) {
   // ── NORMAL card ──────────────────────────────────────────────────────────
   return (
     <>
-      <div className={`glass border rounded-2xl mx-4 mb-3 overflow-hidden ${
-        hasUnconfirmed ? "crimson-border shadow-crimson-card" : "border-border"
+      <div className={`rounded-2xl mx-4 mb-3 overflow-hidden border ${
+        hasUnconfirmed ? "crimson-border shadow-crimson-card" : "border-white/[0.09]"
       }`}>
-        {/* Header */}
-        <div className="flex items-center gap-2 p-3">
+        {/* Accent stripe */}
+        <div className={`h-[3px] ${hasUnconfirmed ? "bg-crimson-light/60" : "bg-primary/50"}`} />
+
+        {/* Card header */}
+        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-primary/[0.07] to-transparent">
           <Avatar
             name={player.name}
             photo={player.photo}
@@ -426,7 +425,7 @@ export default function PlayerCard({ player }: { player: Player }) {
                 dispatch({ type: "UPDATE_PLAYER", payload: { id: player.id, field: "name", value: e.target.value } })
               }
               placeholder="Nombre del jugador"
-              className="w-full bg-transparent text-base font-bold text-text-primary outline-none placeholder:text-text-muted"
+              className="w-full bg-transparent text-[15px] font-bold text-text-primary outline-none placeholder:text-text-muted disabled:cursor-default"
             />
             {totalInvested > 0 && (
               <p className="text-[10px] text-text-secondary mt-0.5">
@@ -435,59 +434,55 @@ export default function PlayerCard({ player }: { player: Player }) {
             )}
           </div>
           {hasFinalChips && (
-            <div className={`rounded-md px-2 py-0.5 border ${
-              pnl >= 0 ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
+            <div className={`rounded-lg px-2 py-1 border shrink-0 ${
+              pnl >= 0 ? "teal-glow teal-border" : "crimson-glow crimson-border"
             }`}>
-              <span className={`text-xs font-extrabold ${pnl >= 0 ? "text-primary" : "text-crimson-light"}`}>
+              <span className={`text-xs font-extrabold ${pnl >= 0 ? "text-teal-light" : "text-crimson-light"}`}>
                 {formatCLPSigned(pnl)}
               </span>
             </div>
           )}
           <button
             onClick={handleRemove}
-            className={`p-1 ${confirmDelete ? "text-crimson-light" : "text-text-muted"} hover:text-crimson-light`}
-            title={confirmDelete ? "Confirmar" : "Eliminar"}
+            className={`p-1.5 rounded-md transition-colors shrink-0 ${
+              confirmDelete
+                ? "text-crimson-light bg-crimson-light/10"
+                : "text-text-muted hover:text-crimson-light hover:bg-crimson-light/10"
+            }`}
+            title={confirmDelete ? "Toca de nuevo para confirmar" : "Eliminar jugador"}
           >
-            <Trash2 size={18} />
+            <Trash2 size={15} />
           </button>
         </div>
 
-        <div className="h-px bg-border mx-3" />
-
+        {/* Payments */}
+        <SectionDivider label="Pagos" />
         {paymentRows}
 
-        {/* Add rebuy */}
+        {/* Actions */}
         {!isLocked && (
-          <button
-            onClick={() => dispatch({ type: "ADD_REBUY", payload: player.id })}
-            className="flex items-center gap-1 px-4 py-2 text-xs text-primary font-semibold hover:opacity-80"
-          >
-            <Plus size={15} /> Agregar Rebuy
-          </button>
-        )}
-
-        <div className="h-px bg-border mx-3" />
-
-        {/* Early exit button — only when OPEN */}
-        {!isLocked && (
-          <>
+          <div className="flex items-center px-2 py-1.5 gap-1 border-t border-white/[0.05] mt-0.5">
+            <button
+              onClick={() => dispatch({ type: "ADD_REBUY", payload: player.id })}
+              className="flex items-center gap-1.5 py-1.5 px-3 text-xs text-primary font-semibold hover:bg-primary/10 rounded-xl transition"
+            >
+              <Plus size={13} /> Agregar Rebuy
+            </button>
+            <div className="w-px h-4 bg-white/[0.08]" />
             <button
               onClick={() => setExitModal(true)}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs text-warning font-semibold hover:opacity-80 transition w-full"
+              className="flex items-center gap-1.5 py-1.5 px-3 text-xs text-warning font-semibold hover:bg-warning/10 rounded-xl transition"
             >
-              <LogOut size={14} />
-              Salida anticipada
+              <LogOut size={13} /> Salida anticipada
             </button>
-            <div className="h-px bg-border mx-3" />
-          </>
+          </div>
         )}
 
         {/* Final chips */}
-        <div className="flex items-center gap-2 px-3 py-2">
-          <Coins size={18} className="text-warning" />
-          <span className="text-xs font-bold text-warning w-24">Fichas Finales</span>
-          <div className="flex-1 flex items-center glass-strong border border-border rounded-md px-2">
-            <span className="text-sm text-text-secondary font-bold mr-0.5">$</span>
+        <SectionDivider label="Fichas Finales" />
+        <div className="px-4 pb-3">
+          <div className="flex items-center glass-strong border border-white/[0.08] rounded-xl px-3">
+            <Coins size={15} className="text-warning mr-2 shrink-0" />
             <input
               type="text"
               inputMode="numeric"
@@ -510,25 +505,24 @@ export default function PlayerCard({ player }: { player: Player }) {
               onBlur={() => setChipsFocused(false)}
               placeholder="0"
               maxLength={9}
-              className="flex-1 bg-transparent text-base text-text-primary font-semibold py-1 outline-none placeholder:text-text-muted min-w-0"
+              className="flex-1 bg-transparent text-base text-text-primary font-bold py-2.5 outline-none placeholder:text-text-muted min-w-0"
             />
             <span className="text-[10px] text-text-muted ml-1">CLP</span>
           </div>
-        </div>
 
-        {/* Net result */}
-        {hasFinalChips && totalInvested > 0 && (
-          <div className={`flex items-center gap-2 mx-3 mb-3 px-3 py-2 rounded-md border ${
-            pnl >= 0 ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
-          }`}>
-            {pnl >= 0
-              ? <TrendingUp size={16} className="text-primary" />
-              : <TrendingDown size={16} className="text-crimson-light" />}
-            <span className={`text-sm font-bold ${pnl >= 0 ? "text-primary" : "text-crimson-light"}`}>
-              Resultado Neto: {formatCLPSigned(pnl)} CLP
-            </span>
-          </div>
-        )}
+          {hasFinalChips && totalInvested > 0 && (
+            <div className={`mt-2 flex items-center gap-2 px-3 py-2 rounded-xl border ${
+              pnl >= 0 ? "teal-glow teal-border" : "crimson-glow crimson-border"
+            }`}>
+              {pnl >= 0
+                ? <TrendingUp size={14} className="text-teal-light" />
+                : <TrendingDown size={14} className="text-crimson-light" />}
+              <span className={`text-xs font-bold ${pnl >= 0 ? "text-teal-light" : "text-crimson-light"}`}>
+                Resultado: {formatCLPSigned(pnl)} CLP
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {exitModal && (

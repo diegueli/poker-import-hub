@@ -14,96 +14,83 @@ export default function TableBalanceWidget() {
   const overflow = totalFinalChips > totalInvested;
 
   return (
-    <div
-      className={`mx-4 mb-4 rounded-2xl border p-4 flex flex-col gap-3 ${
-        isBalanced ? "emerald-glow emerald-border" : "crimson-glow crimson-border"
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        {isBalanced ? (
-          <Scale size={18} className="text-primary" />
-        ) : (
-          <AlertOctagon size={18} className="text-crimson-light" />
-        )}
-        <h3
-          className={`text-xs font-extrabold tracking-[0.15em] ${
-            isBalanced ? "text-primary" : "text-crimson-light"
-          }`}
-        >
-          BALANCE DE MESA
+    <div className={`mx-4 mb-4 rounded-2xl border overflow-hidden ${
+      isBalanced ? "teal-glow teal-border" : "crimson-glow crimson-border"
+    }`}>
+      {/* Header */}
+      <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${
+        isBalanced ? "border-teal/20 bg-teal/[0.06]" : "border-crimson-light/20 bg-crimson-light/[0.06]"
+      }`}>
+        {isBalanced
+          ? <Scale size={15} className="text-teal-light" />
+          : <AlertOctagon size={15} className="text-crimson-light" />}
+        <h3 className={`text-[10px] font-extrabold tracking-[0.18em] uppercase ${
+          isBalanced ? "text-teal-light" : "text-crimson-light"
+        }`}>
+          Balance de Mesa
         </h3>
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="flex-1 glass border border-border rounded-md p-2 flex flex-col items-center">
-          <span className="text-[10px] text-text-secondary font-semibold tracking-wider mb-0.5">
-            Σ Entradas
-          </span>
-          <span className="text-xl font-extrabold text-text-primary tabular-nums">
-            {formatCLP(totalInvested)}
-          </span>
-          <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
-        </div>
-        <div className="w-8 text-center">
-          <span
-            className={`text-3xl font-black ${
-              isBalanced ? "text-primary" : "text-crimson-light"
-            }`}
-          >
+      <div className="px-4 py-3 flex flex-col gap-3">
+        {/* Stats */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 glass border border-white/[0.07] rounded-xl p-3 flex flex-col items-center">
+            <span className="text-[9px] text-text-secondary font-semibold tracking-wider mb-1">Σ Entradas</span>
+            <span className="text-xl font-extrabold text-text-primary tabular-nums">{formatCLP(totalInvested)}</span>
+            <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
+          </div>
+
+          <span className={`text-3xl font-black leading-none ${
+            isBalanced ? "text-teal-light" : "text-crimson-light"
+          }`}>
             {isBalanced ? "=" : "≠"}
           </span>
-        </div>
-        <div className="flex-1 glass border border-border rounded-md p-2 flex flex-col items-center">
-          <span className="text-[10px] text-text-secondary font-semibold tracking-wider mb-0.5">
-            Σ Fichas Finales
-          </span>
-          <span className="text-xl font-extrabold text-text-primary tabular-nums">
-            {formatCLP(totalFinalChips)}
-          </span>
-          <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
-        </div>
-      </div>
 
-      {isBalanced ? (
-        <div className="flex items-center justify-center gap-2 emerald-glow border emerald-border rounded-md p-2">
-          <CheckCircle2 size={16} className="text-primary" />
-          <span className="text-xs font-bold text-primary">
-            Mesa Cuadrada — Lista para liquidar
-          </span>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center gap-2 crimson-glow border crimson-border rounded-md p-2">
-          <AlertTriangle size={16} className="text-crimson-light" />
-          <span className="text-xs font-bold text-crimson-light">
-            Descuadre: {formatCLP(Math.abs(discrepancy))} CLP
-            {discrepancy > 0 ? " (faltan fichas)" : " (sobran fichas)"}
-          </span>
-        </div>
-      )}
-
-      {totalInvested > 0 && (
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-text-muted tracking-wider">
-            Cobertura de fichas
-          </span>
-          <div className="relative h-1.5 glass rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all ${
-                isBalanced ? "bg-primary" : overflow ? "bg-warning" : "bg-crimson-light"
-              }`}
-              style={{ width: widthPct }}
-            />
-            <span className="absolute right-0 top-0 bottom-0 w-px bg-text-muted" />
+          <div className="flex-1 glass border border-white/[0.07] rounded-xl p-3 flex flex-col items-center">
+            <span className="text-[9px] text-text-secondary font-semibold tracking-wider mb-1">Σ Fichas</span>
+            <span className="text-xl font-extrabold text-text-primary tabular-nums">{formatCLP(totalFinalChips)}</span>
+            <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
           </div>
-          <span
-            className={`text-[10px] font-bold text-right ${
-              isBalanced ? "text-primary" : "text-crimson-light"
-            }`}
-          >
-            {Math.round(ratio * 100)}%
-          </span>
         </div>
-      )}
+
+        {/* Status banner */}
+        {isBalanced ? (
+          <div className="flex items-center justify-center gap-2 teal-glow border teal-border rounded-xl p-2.5">
+            <CheckCircle2 size={15} className="text-teal-light" />
+            <span className="text-xs font-bold text-teal-light">Mesa Cuadrada — Lista para liquidar</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2 crimson-glow border crimson-border rounded-xl p-2.5">
+            <AlertTriangle size={15} className="text-crimson-light" />
+            <span className="text-xs font-bold text-crimson-light">
+              Descuadre: {formatCLP(Math.abs(discrepancy))} CLP
+              {discrepancy > 0 ? " · faltan fichas" : " · sobran fichas"}
+            </span>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        {totalInvested > 0 && (
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] text-text-muted tracking-wider">Cobertura de fichas</span>
+              <span className={`text-[10px] font-bold ${
+                isBalanced ? "text-teal-light" : "text-crimson-light"
+              }`}>
+                {Math.round(ratio * 100)}%
+              </span>
+            </div>
+            <div className="relative h-1.5 glass border-0 rounded-full overflow-hidden bg-white/[0.06]">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  isBalanced ? "bg-teal" : overflow ? "bg-warning" : "bg-crimson-light"
+                }`}
+                style={{ width: widthPct }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

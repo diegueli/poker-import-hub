@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { UserPlus, Spade } from "lucide-react";
+
 import { SessionProvider, useSession } from "@/context/SessionContext";
 import DataIntegrityHeader from "@/components/poker/DataIntegrityHeader";
 import SessionConfig from "@/components/poker/SessionConfig";
@@ -22,14 +23,16 @@ function HomeScreen() {
         <SessionConfig />
         {players.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center px-6 py-20 gap-3">
-            <Spade size={64} className="text-text-muted" />
+            <div className="w-20 h-20 rounded-2xl gold-glow border gold-border flex items-center justify-center">
+              <Spade size={36} className="text-primary" />
+            </div>
             <h2 className="text-xl font-extrabold text-text-primary">Mesa vacía</h2>
             <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
               Agrega los jugadores para comenzar a registrar la sesión de poker.
             </p>
             <button
               onClick={() => setModal(true)}
-              className="mt-3 flex items-center gap-2 bg-primary text-text-inverse rounded-2xl px-5 py-3 font-extrabold shadow-emerald"
+              className="mt-3 flex items-center gap-2 gold-glow border gold-border text-primary rounded-2xl px-6 py-3 font-extrabold shadow-gold"
             >
               <UserPlus size={20} />
               Agregar primer jugador
@@ -44,7 +47,7 @@ function HomeScreen() {
             {!isLocked && (
               <button
                 onClick={() => setModal(true)}
-                className="mx-4 mb-3 w-[calc(100%-2rem)] flex items-center justify-center gap-2 py-3 emerald-glow border emerald-border border-dashed rounded-2xl text-primary font-semibold text-sm hover:opacity-90 transition"
+                className="mx-4 mb-3 w-[calc(100%-2rem)] flex items-center justify-center gap-2 py-3 glass border border-primary/25 border-dashed rounded-2xl text-primary font-semibold text-sm hover:gold-glow hover:border-primary/50 transition"
               >
                 <UserPlus size={18} />
                 Agregar jugador

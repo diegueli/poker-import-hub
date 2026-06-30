@@ -7,21 +7,17 @@ const STATE_LABELS: Record<SessionStateName, string> = {
   LOCKED: "Contando Fichas",
   SETTLED: "Liquidada",
 };
-const STATE_COLOR: Record<SessionStateName, string> = {
-  OPEN: "text-primary border-primary",
-  LOCKED: "text-warning border-warning",
-  SETTLED: "text-blue-400 border-blue-400",
-};
-const STATE_DOT: Record<SessionStateName, string> = {
-  OPEN: "bg-primary",
-  LOCKED: "bg-warning",
-  SETTLED: "bg-blue-400",
+const STATE_STYLE: Record<SessionStateName, { dot: string; badge: string }> = {
+  OPEN:    { dot: "bg-teal",    badge: "text-teal-light border-teal/40" },
+  LOCKED:  { dot: "bg-warning", badge: "text-warning border-warning/40" },
+  SETTLED: { dot: "bg-primary", badge: "text-primary border-primary/40" },
 };
 
 export default function DataIntegrityHeader() {
   const { state, dispatch } = useSession();
   const { sessionState, players, sessionDate } = state;
   const { confirmedPot, unconfirmedDebt } = computeSessionStats(state);
+  const style = STATE_STYLE[sessionState];
 
   const date = new Date(sessionDate).toLocaleDateString("es-CL", {
     day: "2-digit",
@@ -30,90 +26,97 @@ export default function DataIntegrityHeader() {
   });
 
   return (
-    <header className="bg-surface border-b border-border px-4 pt-5 pb-3 sticky top-0 z-10 backdrop-blur-md">
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-2">
-          <Spade className="text-primary" size={20} />
-          <h1 className="text-lg font-extrabold tracking-[0.15em] text-text-primary">
-            POKER ADMIN
-          </h1>
-        </div>
-        <div className={`flex items-center gap-1.5 border rounded-full px-2 py-0.5 ${STATE_COLOR[sessionState]}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${STATE_DOT[sessionState]}`} />
-          <span className="text-[10px] font-bold tracking-wider">
-            {STATE_LABELS[sessionState]}
-          </span>
-        </div>
-      </div>
+    <header className="sticky top-0 z-10 bg-surface/95 backdrop-blur-md border-b border-white/[0.07]">
+      {/* Top gold accent line */}
+      <div className="h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
 
-      <p className="text-xs text-text-muted mb-3">{date}</p>
-
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex-1 emerald-glow border emerald-border rounded-md p-2 flex flex-col items-center">
-          <span className="text-[9px] font-bold text-text-secondary tracking-widest mb-0.5">
-            POT CONFIRMADO
-          </span>
-          <span className="text-lg font-extrabold text-primary tabular-nums">
-            {formatCLP(confirmedPot)}
-          </span>
-          <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
+      <div className="px-4 pt-4 pb-3 flex flex-col gap-3">
+        {/* Brand row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg gold-glow border gold-border flex items-center justify-center">
+              <Spade size={16} className="text-primary" />
+            </div>
+            <div>
+              <h1 className="text-base font-extrabold tracking-[0.12em] text-text-primary leading-none">
+                POKER ADMIN
+              </h1>
+              <p className="text-[10px] text-text-muted mt-0.5">{date}</p>
+            </div>
+          </div>
+          <div className={`flex items-center gap-1.5 border rounded-full px-2.5 py-1 ${style.badge}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+            <span className="text-[10px] font-bold tracking-wider">{STATE_LABELS[sessionState]}</span>
+          </div>
         </div>
 
-        <RefreshCw
-          size={22}
-          className={unconfirmedDebt > 0 ? "text-crimson-light animate-spin-slow" : "text-text-muted"}
-        />
+        {/* Stats row */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Confirmed pot */}
+          <div className="teal-glow border teal-border rounded-xl p-3 flex flex-col gap-0.5">
+            <span className="text-[9px] font-bold text-text-secondary tracking-widest uppercase">
+              Pot Confirmado
+            </span>
+            <span className="text-2xl font-extrabold text-teal-light tabular-nums leading-none">
+              {formatCLP(confirmedPot)}
+            </span>
+            <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
+          </div>
 
-        <div
-          className={`flex-1 border rounded-md p-2 flex flex-col items-center ${
-            unconfirmedDebt > 0 ? "crimson-glow crimson-border" : "glass border-border"
-          }`}
-        >
-          <span className="text-[9px] font-bold text-text-secondary tracking-widest mb-0.5">
-            DEUDA PENDIENTE
-          </span>
-          <span
-            className={`text-lg font-extrabold tabular-nums ${
+          {/* Unconfirmed debt */}
+          <div className={`border rounded-xl p-3 flex flex-col gap-0.5 ${
+            unconfirmedDebt > 0 ? "crimson-glow crimson-border" : "glass border-white/[0.07]"
+          }`}>
+            <div className="flex items-center gap-1">
+              {unconfirmedDebt > 0 && (
+                <RefreshCw size={10} className="text-crimson-light animate-spin" style={{ animationDuration: "2s" }} />
+              )}
+              <span className="text-[9px] font-bold text-text-secondary tracking-widest uppercase">
+                Deuda Pendiente
+              </span>
+            </div>
+            <span className={`text-2xl font-extrabold tabular-nums leading-none ${
               unconfirmedDebt > 0 ? "text-crimson-light" : "text-text-muted"
-            }`}
-          >
-            {formatCLP(unconfirmedDebt)}
-          </span>
-          <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
+            }`}>
+              {formatCLP(unconfirmedDebt)}
+            </span>
+            <span className="text-[9px] text-text-muted tracking-widest">CLP</span>
+          </div>
         </div>
+
+        {/* Session actions */}
+        {sessionState === "OPEN" && (
+          <button
+            onClick={() => dispatch({ type: "SET_SESSION_STATE", payload: "LOCKED" })}
+            className="w-full flex items-center justify-center gap-2 warning-glow border border-warning/40 rounded-xl py-2.5 text-warning text-sm font-bold hover:border-warning/60 transition"
+          >
+            <Lock size={14} /> Bloquear para contar fichas
+          </button>
+        )}
+
+        {sessionState === "LOCKED" && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => dispatch({ type: "SET_SESSION_STATE", payload: "OPEN" })}
+              className="flex-1 flex items-center justify-center gap-1.5 glass border border-white/10 rounded-xl py-2.5 text-text-secondary text-sm font-semibold hover:border-white/20 transition"
+            >
+              <Unlock size={14} /> Re-abrir
+            </button>
+            <button
+              onClick={() => dispatch({ type: "SET_SESSION_STATE", payload: "SETTLED" })}
+              className="flex-1 flex items-center justify-center gap-1.5 gold-glow border gold-border rounded-xl py-2.5 text-primary text-sm font-bold hover:border-primary/60 transition"
+            >
+              <CheckCircle2 size={14} /> Liquidar sesión
+            </button>
+          </div>
+        )}
+
+        {sessionState === "SETTLED" && (
+          <div className="flex items-center justify-center gap-2 gold-glow border gold-border rounded-xl py-2.5 text-primary text-sm font-bold">
+            <BadgeCheck size={16} /> Sesión Liquidada
+          </div>
+        )}
       </div>
-
-      {sessionState === "OPEN" && (
-        <button
-          onClick={() => dispatch({ type: "SET_SESSION_STATE", payload: "LOCKED" })}
-          className="w-full flex items-center justify-center gap-1.5 border border-border rounded-full py-1.5 px-3 text-warning text-sm font-semibold hover:bg-warning/10 transition"
-        >
-          <Lock size={14} /> Bloquear para contar fichas
-        </button>
-      )}
-
-      {sessionState === "LOCKED" && (
-        <div className="flex gap-2">
-          <button
-            onClick={() => dispatch({ type: "SET_SESSION_STATE", payload: "OPEN" })}
-            className="flex-1 flex items-center justify-center gap-1.5 border border-border rounded-full py-1.5 px-3 text-text-secondary text-sm font-semibold hover:glass-medium transition"
-          >
-            <Unlock size={14} /> Re-abrir mesa
-          </button>
-          <button
-            onClick={() => dispatch({ type: "SET_SESSION_STATE", payload: "SETTLED" })}
-            className="flex-1 flex items-center justify-center gap-1.5 emerald-border border rounded-full py-1.5 px-3 text-primary text-sm font-semibold hover:emerald-glow transition"
-          >
-            <CheckCircle2 size={14} /> Liquidar sesión
-          </button>
-        </div>
-      )}
-
-      {sessionState === "SETTLED" && (
-        <div className="flex items-center justify-center gap-1.5 emerald-glow border emerald-border rounded-full py-1.5 text-primary text-sm font-semibold">
-          <BadgeCheck size={14} /> Sesión liquidada
-        </div>
-      )}
     </header>
   );
 }
