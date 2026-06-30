@@ -25,6 +25,10 @@ export default {
           DEFAULT: "hsl(var(--crimson))",
           light: "hsl(var(--crimson-light))",
         },
+        teal: {
+          DEFAULT: "hsl(var(--teal))",
+          light: "hsl(var(--teal-light))",
+        },
         warning: "hsl(var(--warning))",
         whatsapp: "hsl(var(--whatsapp))",
         gold: "hsl(var(--gold))",
